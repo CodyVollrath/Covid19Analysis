@@ -1,0 +1,3 @@
+No Missing functionality.
+
+1 Bug: If a duplicate record exists in a dataset (Not talking about the merge duplicate, but rather a duplicate in the same file.) and there is only one day for that month, it will cause the days where that value occured to display like this for example: 15th15th.
