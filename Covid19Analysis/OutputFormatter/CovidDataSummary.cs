@@ -19,6 +19,9 @@ namespace Covid19Analysis.OutputFormatter
         public string StateFilter { get; }
         #endregion
 
+        #region Private Members
+        private CovidDataStatistics covidStatistics;
+        #endregion
         #region Constructors
 
         /// <Summary>
@@ -36,6 +39,7 @@ namespace Covid19Analysis.OutputFormatter
             this.CovidRecords = collection ?? throw new ArgumentNullException(nameof(collection));
             this.StateFilter = stateFilter;
             this.applyFilterToCovidCollection();
+            this.covidStatistics = new CovidDataStatistics(this.CovidRecords);
         }
 
         #endregion
@@ -125,7 +129,7 @@ namespace Covid19Analysis.OutputFormatter
             var highestPercentageRecord =
                 (from record in this.CovidRecords
                  orderby findPercentageForRecord(record) descending
-                 where (record.NegativeTests + record.PositiveTests) != 0
+                 where (record.TotalTests) != 0
                  select record)
                 .First();
 
@@ -159,14 +163,14 @@ namespace Covid19Analysis.OutputFormatter
             var averagePositiveTests =
                 (from record in this.CovidRecords where record.Date.Date >= this.getDateOfFirstPositiveTest().Date select record.PositiveTests)
                 .Average();
-            var sumOfTotalTests = this.CovidRecords
+            var averageTotalTests = this.CovidRecords
                                          .Where(record => record.Date.Date >= this.getDateOfFirstPositiveTest())
                                          .Select(record => record.TotalTests).Average();
-            if (sumOfTotalTests == 0)
+            if (averageTotalTests == 0)
             {
                 return string.Empty;
             }
-            var positivityRate = Format.FormatNumericValueAsPercentage(averagePositiveTests/sumOfTotalTests);
+            var positivityRate = Format.FormatNumericValueAsPercentage(averagePositiveTests/averageTotalTests);
 
             return CovidDataLines.GetCovidLineForValue(Assets.OverallPositivityRateLabel, positivityRate);
         }
