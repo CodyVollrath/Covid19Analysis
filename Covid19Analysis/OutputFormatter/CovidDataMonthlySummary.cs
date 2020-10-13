@@ -22,7 +22,7 @@ namespace Covid19Analysis.OutputFormatter
         /// <Summary>
         /// Initializes a new instance of the <a onclick="return false;" href="CovidDataStateSummary" originaltag="see">CovidDataMonthlySummary</a> class.
         /// <code>Precondition: collection != null</code>
-        /// <code>Postcondition: CovidRecords1 == collection</code>
+        /// <code>Postcondition: CovidRecords == collection</code>
         /// </Summary>
         /// <param name="collection">The collection of CovidRecords1.</param>s
         /// <exception cref="ArgumentNullException">collection</exception>
@@ -116,7 +116,7 @@ namespace Covid19Analysis.OutputFormatter
             reportOfTheMonth += monthHeading;
             reportOfTheMonth += getHighestPositiveTestWithDays(monthGroup);
             reportOfTheMonth += getLowestPositiveTestWithDays(monthGroup);
-            reportOfTheMonth += getHighestCombinedTestWithDays(monthGroup);
+            reportOfTheMonth += getHighestTotalTestsWithDays(monthGroup);
             reportOfTheMonth += getLowestTotalTestsWithDays(monthGroup);
             reportOfTheMonth += getAveragePositiveTests(monthGroup);
             reportOfTheMonth += getAverageTotalTests(monthGroup);
@@ -152,7 +152,7 @@ namespace Covid19Analysis.OutputFormatter
                 lowestPositivesFormatted, daysOutput);
         }
 
-        private static string getHighestCombinedTestWithDays(IEnumerable<CovidRecord> collection)
+        private static string getHighestTotalTestsWithDays(IEnumerable<CovidRecord> collection)
         {
             var covidRecords = collection.ToArray();
             var highestTotalTests = (from record in covidRecords
@@ -174,8 +174,7 @@ namespace Covid19Analysis.OutputFormatter
             var covidRecords = collection.ToArray();
             var lowestTotalTests = (from record in covidRecords
                                        orderby record.TotalTests ascending
-                                       select record.TotalTests)
-                .First();
+                                       select record.TotalTests).First();
 
             var daysOccurred =
                 (from record in covidRecords where record.TotalTests == lowestTotalTests select record.Date).ToList();

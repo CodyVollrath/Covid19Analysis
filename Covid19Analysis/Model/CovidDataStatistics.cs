@@ -1,21 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Covid19Analysis.Resources;
 
 namespace Covid19Analysis.Model
 {
+
+    /// <summary>This class finds particular data points out of a CovidDataCollection</summary>
     public class CovidDataStatistics
     {
         #region Properties
 
+        /// <summary>Gets the covid records.</summary>
+        /// <value>The covid records.</value>
         public CovidDataCollection CovidRecords { get; }
 
         #endregion
 
         #region Constructors
+
+        /// <summary>Initializes a new instance of the <see cref="CovidDataStatistics" /> class.
+        ///<code>Precondition: covidRecords != null</code>
+        /// <code>Postcondition: CovidRecords == covidRecords</code>
+        /// </summary>
+        /// <param name="covidRecords">The covid records.</param>
+        /// <exception cref="ArgumentNullException">covidRecords</exception>
         public CovidDataStatistics(CovidDataCollection covidRecords)
         {
             this.CovidRecords = covidRecords ?? throw new ArgumentNullException(nameof(covidRecords));
@@ -24,81 +32,78 @@ namespace Covid19Analysis.Model
 
         #region Public Methods
 
+        /// <summary>Finds the day of first positive test.</summary>
+        /// <returns>
+        ///   <para>the date of the first positive test</para>
+        /// </returns>
         public DateTime FindDayOfFirstPositiveTest()
         {
             var dayOfFirstPositive = this.CovidRecords.OrderBy(record => record.Date).First(record => record.PositiveTests > 0).Date;
             return dayOfFirstPositive;
         }
 
-        public int FindHighestPositiveCases()
+
+        /// <summary>Finds the record with highest positive cases.</summary>
+        /// <returns>The CovidRecord with the highest positive test</returns>
+        public CovidRecord FindRecordWithHighestPositiveCases()
         {
-            var highestPositiveTestCase = this.CovidRecords.OrderByDescending(record => record.PositiveTests).First().PositiveTests;
-            return highestPositiveTestCase;
+            var highestPositiveTestCaseRecord = this.CovidRecords.OrderByDescending(record => record.PositiveTests).First();
+            return highestPositiveTestCaseRecord;
         }
 
-        public int FindLowestPositiveTests()
+
+        /// <summary>Finds the record with highest negative tests.</summary>
+        /// <returns>
+        ///   <para>The CovidRecord with the highest negative tests.</para>
+        /// </returns>
+        public CovidRecord FindRecordWithHighestNegativeTests()
         {
-            var lowestPositiveTestCase = this.CovidRecords.OrderBy(record => record.PositiveTests).First().PositiveTests;
-            return lowestPositiveTestCase;
+            var highestNegativeTestRecord = this.CovidRecords.OrderByDescending(record => record.NegativeTests).First();
+            return highestNegativeTestRecord;
         }
 
-        public int FindHighestNegativeTests()
+
+        /// <summary>Finds the record with highest total tests.</summary>
+        /// <returns>
+        ///   <para>The CovidRecord with the highest total tests</para>
+        /// </returns>
+        public CovidRecord FindRecordWithHighestTotalTests()
         {
-            var highestNegativeTests = this.CovidRecords.OrderByDescending(record => record.NegativeTests).First().NegativeTests;
-            return highestNegativeTests;
+            var highestTotalTestRecord = this.CovidRecords.OrderByDescending(record => record.TotalTests).First();
+            return highestTotalTestRecord;
         }
 
-        public int FindLowestNegativeTests()
+
+        /// <summary>Finds the record with highest deaths.</summary>
+        /// <returns>The CovidRecord with the highest deaths</returns>
+        public CovidRecord FindRecordWithHighestDeaths()
         {
-            var lowestNegativeTests = this.CovidRecords.OrderBy(record => record.NegativeTests).First().NegativeTests;
-            return lowestNegativeTests;
+            var highestDeathRecord = this.CovidRecords.OrderByDescending(record => record.Deaths).First();
+            return highestDeathRecord;
         }
 
-        public int FindHighestTotalTests()
+
+        /// <summary>Finds the record with highest hospitalizations.</summary>
+        /// <returns>The CovidRecord with the highest hospitalizations</returns>
+        public CovidRecord FindRecordWithHighestHospitalizations()
         {
-            var highestTotalTests = this.CovidRecords.OrderByDescending(record => record.TotalTests).First().TotalTests;
-            return highestTotalTests;
+            var highestHospitalizationsRecord =
+                this.CovidRecords.OrderByDescending(record => record.Hospitalizations).First();
+            return highestHospitalizationsRecord;
         }
 
-        public int FindLowestTotalTests()
+
+        /// <summary>Finds the record with highest percentage of positive tests.</summary>
+        /// <returns>The CovidRecord with highest percentage of positive tests</returns>
+        public CovidRecord FindRecordWithHighestPercentageOfPositiveTests()
         {
-            var lowestTotalTests = this.CovidRecords.OrderBy(record => record.TotalTests).First().TotalTests;
-            return lowestTotalTests;
+            var recordWithHighestPercentage = this.CovidRecords.OrderByDescending(FindPositivePercentageForRecord).First(record => record.TotalTests != 0);
+            return recordWithHighestPercentage;
         }
 
-        public int FindHighestDeaths()
-        {
-            var highestDeaths = this.CovidRecords.OrderByDescending(record => record.Deaths).First().Deaths;
-            return highestDeaths;
-        }
 
-        public int FindLowestDeaths()
-        {
-            var lowestDeaths = this.CovidRecords.OrderBy(record => record.Deaths).First().Deaths;
-            return lowestDeaths;
-        }
-
-        public int FindHighestHospitalizations()
-        {
-            var highestHospitalizations =
-                this.CovidRecords.OrderByDescending(record => record.Hospitalizations).First().Deaths;
-            return highestHospitalizations;
-        }
-
-        public int FindLowestHospitalizations()
-        {
-            var lowestHospitalizations =
-                this.CovidRecords.OrderBy(record => record.Hospitalizations).First().Deaths;
-            return lowestHospitalizations;
-        }
-
-        public double FindHighestPercentage()
-        {
-            var recordWithHighestPercentage = this.CovidRecords.OrderByDescending(findPercentageForRecord).First(record => record.TotalTests != 0);
-            var highestPercentageValue = findPercentageForRecord(recordWithHighestPercentage);
-            return highestPercentageValue;
-        }
-
+        /// <summary>Finds the average positive tests since first positive test.</summary>
+        /// <returns>The average positive tests since first positive test date</returns>
         public double FindAveragePositiveTestsSinceFirstPositiveTest()
         {
             var firstDateWithPositive = this.FindDayOfFirstPositiveTest();
@@ -108,15 +113,9 @@ namespace Covid19Analysis.Model
             return averagePositiveTests;
         }
 
-        public double FindAverageTotalTestsSinceFirstPositiveTest()
-        {
-            var firstDateWithPositive = this.FindDayOfFirstPositiveTest();
-            var averageTotalTests = this.CovidRecords
-                              .Where(record => record.Date.Date >= firstDateWithPositive)
-                              .Select(record => record.TotalTests).Average();
-            return averageTotalTests;
-        }
 
+        /// <summary>Finds the overall positivity rate since first positive test.</summary>
+        /// <returns>The overall positivty rate since first positive test date</returns>
         public double FindOverallPositivityRateSinceFirstPositiveTest()
         {
             var firstDateWithPositive = this.FindDayOfFirstPositiveTest();
@@ -130,25 +129,37 @@ namespace Covid19Analysis.Model
             return positivityRate;
         }
 
-        public double FindNumberOfDaysSinceFirstPositiveTestGreaterThanThreshold(int threshold)
+
+        /// <summary>Finds the number of days since first positive test greater than threshold.</summary>
+        /// <param name="threshold">The threshold.</param>
+        /// <returns>The number of days greater than a threshold since first positive test date</returns>
+        public int FindNumberOfDaysSinceFirstPositiveTestGreaterThanThreshold(int threshold)
         {
             var firstDateWithPositive = this.FindDayOfFirstPositiveTest();
             var daysGreaterThanThreshold = this.CovidRecords.Count(record => record.Date.Date >= firstDateWithPositive && record.PositiveTests > threshold);
             return daysGreaterThanThreshold;
         }
 
-        public double FindNumberOfDaysSinceFirstPositiveTestLessThanThreshold(int threshold)
+
+        /// <summary>Finds the number of days since first positive test less than threshold.</summary>
+        /// <param name="threshold">The threshold.</param>
+        /// <returns>The number of days less than a threshold since first positive test date</returns>
+        public int FindNumberOfDaysSinceFirstPositiveTestLessThanThreshold(int threshold)
         {
             var firstDateWithPositive = this.FindDayOfFirstPositiveTest();
             var daysGreaterThanThreshold = this.CovidRecords.Count(record => record.Date.Date >= firstDateWithPositive && record.PositiveTests < threshold);
             return daysGreaterThanThreshold;
         }
 
-        #endregion
 
-        #region Private Helpers
-        private static double findPercentageForRecord(CovidRecord record)
+        /// <summary>Finds the positive percentage for record.
+        ///<code>Precondition: record != null</code>
+        /// </summary>
+        /// <param name="record">The record.</param>
+        /// <returns>The positive percentage of a record</returns>
+        public static double FindPositivePercentageForRecord(CovidRecord record)
         {
+            record = record ?? throw new ArgumentNullException(nameof(record));
             var totalTests = record.TotalTests;
             if (totalTests != 0)
             {

@@ -28,7 +28,7 @@ namespace Covid19Analysis.OutputFormatter
         /// Initializes a new instance of the <a onclick="return false;" href="CovidDataStateSummary" originaltag="see">CovidDataStateSummary</a> class.
         /// <para>If the stateFilter is null, then the collection will not be filtered</para>
         /// <code>Precondition: collection != null</code>
-        /// <code>Postcondition: CovidRecords1 == collection </code>
+        /// <code>Postcondition: CovidRecords == collection AND StateFilter == stateFilter </code>
         /// </Summary>
         /// <param name="collection">The collection.</param>
         /// <param name="stateFilter">The state filter for the collection</param>
@@ -50,10 +50,12 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>The formatted string of the first day of the positive test</returns>
         public string GetFirstDayOfPositiveTest()
         {
-            var firstDayOfPositiveTest = $"{Assets.FirstDayOfPositiveTestLabel} " +
-                                         $"{this.getDateOfFirstPositiveTest().ToString(Assets.DateStringFormatted)}" +
+            var firstDayOfPositiveTest = this.covidStatistics.FindDayOfFirstPositiveTest();
+
+            var dayOfFirstPositiveTest = $"{Assets.FirstDayOfPositiveTestLabel} " +
+                                         $"{firstDayOfPositiveTest.ToString(Assets.DateStringFormatted)}" +
                                          $"{Environment.NewLine}";
-            return firstDayOfPositiveTest;
+            return dayOfFirstPositiveTest;
         }
 
         #region Highest Metrics
@@ -61,9 +63,7 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>A formatted string with the highest positive test and date</returns>
         public string GetHighestPositiveWithDate()
         {
-            var highestPositiveRecord =
-                (from record in this.CovidRecords orderby record.PositiveTests descending select record)
-                .First();
+            var highestPositiveRecord = this.covidStatistics.FindRecordWithHighestPositiveCases();
             var highestPositive = Format.FormatIntegerAsFormattedString(highestPositiveRecord.PositiveTests);
             var date = highestPositiveRecord.Date.ToString(Assets.DateStringFormatted);
 
@@ -74,9 +74,7 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>A formatted string with the highest negative test and date</returns>
         public string GetHighestNegativeWithDate()
         {
-            var highestNegativeRecord =
-                (from record in this.CovidRecords orderby record.NegativeTests descending select record)
-                .First();
+            var highestNegativeRecord = this.covidStatistics.FindRecordWithHighestNegativeTests();
             var highestNegative = Format.FormatIntegerAsFormattedString(highestNegativeRecord.NegativeTests);
             var date = highestNegativeRecord.Date.ToString(Assets.DateStringFormatted);
 
@@ -87,10 +85,7 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>A formatted string with the highest total tests and date</returns>
         public string GetHighestTotalTestsWithDate()
         {
-            var highestTotalTests =
-                (from record in this.CovidRecords orderby record.TotalTests descending select record)
-                .First();
-
+            var highestTotalTests = this.covidStatistics.FindRecordWithHighestTotalTests();
             var highestTotalTestsFormatted = Format.FormatIntegerAsFormattedString(highestTotalTests.TotalTests);
             var date = highestTotalTests.Date.ToString(Assets.DateStringFormatted);
 
@@ -101,9 +96,7 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>A formatted string with the highest deaths test and date</returns>
         public string GetHighestDeathsWithDate()
         {
-            var highestDeathsRecord =
-                (from record in this.CovidRecords orderby record.Deaths descending select record)
-                .First();
+            var highestDeathsRecord = this.covidStatistics.FindRecordWithHighestDeaths();
             var highestDeaths = Format.FormatIntegerAsFormattedString(highestDeathsRecord.Deaths);
             var date = highestDeathsRecord.Date.ToString(Assets.DateStringFormatted);
             return CovidDataLines.GetCovidLineForValueAndDate(Assets.HighestDeathsLabel, highestDeaths, date);
@@ -113,9 +106,7 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>A formatted string with the highest hospitalizations test and date</returns>
         public string GetHighestHospitalizationsWithDate()
         {
-            var highestHospitalizationsRecord =
-                (from record in this.CovidRecords orderby record.Hospitalizations descending select record)
-                .First();
+            var highestHospitalizationsRecord = this.covidStatistics.FindRecordWithHighestHospitalizations();
             var highestHospitalizations = Format.FormatIntegerAsFormattedString(highestHospitalizationsRecord.Hospitalizations);
             var date = highestHospitalizationsRecord.Date.ToString(Assets.DateStringFormatted);
 
@@ -126,14 +117,9 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>A formatted string with the highest percentage of positive  test and date</returns>
         public string GetHighestPercentageOfTestsPerDayWithDate()
         {
-            var highestPercentageRecord =
-                (from record in this.CovidRecords
-                 orderby findPercentageForRecord(record) descending
-                 where (record.TotalTests) != 0
-                 select record)
-                .First();
+            var highestPercentageRecord = this.covidStatistics.FindRecordWithHighestPercentageOfPositiveTests();
 
-            var highestPercentage = Format.FormatNumericValueAsPercentage(findPercentageForRecord(highestPercentageRecord));
+            var highestPercentage = Format.FormatNumericValueAsPercentage(CovidDataStatistics.FindPositivePercentageForRecord(highestPercentageRecord));
             var date = highestPercentageRecord.Date.ToString(Assets.DateStringFormatted);
             return CovidDataLines.GetCovidLineForValueAndDate(Assets.HighestPercentageOfPositiveCasesLabel, highestPercentage, date);
         }
@@ -147,9 +133,7 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>A formatted string with the average positive  test.</returns>
         public string GetAveragePositiveTestsSinceFirstPositiveTest()
         {
-            var averagePositiveTest =
-                (from record in this.CovidRecords where record.Date.Date >= this.getDateOfFirstPositiveTest().Date select record.PositiveTests)
-                .Average();
+            var averagePositiveTest = this.covidStatistics.FindAveragePositiveTestsSinceFirstPositiveTest();
 
             var average = Format.FormatAveragesWithTwoDecimalPlaces(averagePositiveTest);
 
@@ -160,18 +144,8 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>A formatted string with the Overall Positivity Rate.</returns>
         public string GetOverallPositivityRateSinceFirstPositiveTest()
         {
-            var averagePositiveTests =
-                (from record in this.CovidRecords where record.Date.Date >= this.getDateOfFirstPositiveTest().Date select record.PositiveTests)
-                .Average();
-            var averageTotalTests = this.CovidRecords
-                                         .Where(record => record.Date.Date >= this.getDateOfFirstPositiveTest())
-                                         .Select(record => record.TotalTests).Average();
-            if (averageTotalTests == 0)
-            {
-                return string.Empty;
-            }
-            var positivityRate = Format.FormatNumericValueAsPercentage(averagePositiveTests/averageTotalTests);
-
+            var overallPositivityRate = this.covidStatistics.FindOverallPositivityRateSinceFirstPositiveTest();
+            var positivityRate = Format.FormatNumericValueAsPercentage(overallPositivityRate);
             return CovidDataLines.GetCovidLineForValue(Assets.OverallPositivityRateLabel, positivityRate);
         }
 
@@ -183,10 +157,7 @@ namespace Covid19Analysis.OutputFormatter
         public string GetTheDaysFromTheFirstPositiveTestGreaterThanThreshold(int threshold)
         {
             var daysGreaterThanThreshold =
-                (from record in this.CovidRecords
-                 where record.Date.Date >= this.getDateOfFirstPositiveTest().Date && record.PositiveTests > threshold
-                 select record)
-                .Count();
+                this.covidStatistics.FindNumberOfDaysSinceFirstPositiveTestGreaterThanThreshold(threshold);
 
             var days = Format.FormatIntegerAsFormattedString(daysGreaterThanThreshold);
             var thresholdFormatted = Format.FormatIntegerAsFormattedString(threshold);
@@ -198,8 +169,8 @@ namespace Covid19Analysis.OutputFormatter
         public string GetTheDaysFromTheFirstPositiveTestLessThanThreshold(int threshold)
         {
             var daysLessThanThreshold =
-                (from record in this.CovidRecords where record.Date.Date >= this.getDateOfFirstPositiveTest().Date && record.PositiveTests < threshold select record)
-                .Count();
+                this.covidStatistics.FindNumberOfDaysSinceFirstPositiveTestLessThanThreshold(threshold);
+
             var days = Format.FormatIntegerAsFormattedString(daysLessThanThreshold);
             var thresholdFormatted = Format.FormatIntegerAsFormattedString(threshold);
             return CovidDataLines.GetCovidLineForValueWithThreshold(Assets.DaysLessThanValueLabel, days, thresholdFormatted);
