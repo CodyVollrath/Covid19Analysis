@@ -97,7 +97,7 @@ namespace Covid19Analysis.Model
         /// <returns>The CovidRecord with highest percentage of positive tests</returns>
         public CovidRecord FindRecordWithHighestPercentageOfPositiveTests()
         {
-            var recordWithHighestPercentage = this.CovidRecords.OrderByDescending(FindPositivePercentageForRecord).First(record => record.TotalTests != 0);
+            var recordWithHighestPercentage = this.CovidRecords.OrderByDescending(FindPositivePercentageForRecord).ThenByDescending(record => record.PositiveTests).First(record => record.TotalTests != 0);
             return recordWithHighestPercentage;
         }
 
@@ -130,22 +130,36 @@ namespace Covid19Analysis.Model
         }
 
 
-        /// <summary>Finds the number of days since first positive test greater than threshold.</summary>
+        /// <summary>Finds the number of days since first positive test greater than threshold.
+        /// <code>Precondition: threshold >= 0</code>
+        /// </summary>
         /// <param name="threshold">The threshold.</param>
         /// <returns>The number of days greater than a threshold since first positive test date</returns>
-        public int FindNumberOfDaysSinceFirstPositiveTestGreaterThanThreshold(int threshold)
+        public int FindNumberOfDaysForPositiveTestsGreaterThanThreshold(int threshold)
         {
+            if (threshold < 0)
+            {
+                throw new ArgumentException($"{nameof(threshold)} can not be less than 0");
+            }
+
             var firstDateWithPositive = this.FindDayOfFirstPositiveTest();
             var daysGreaterThanThreshold = this.CovidRecords.Count(record => record.Date.Date >= firstDateWithPositive && record.PositiveTests > threshold);
             return daysGreaterThanThreshold;
         }
 
 
-        /// <summary>Finds the number of days since first positive test less than threshold.</summary>
+        /// <summary>
+        /// Finds the number of days since first positive test less than threshold.
+        /// <code>Precondition: threshold >= 0</code>
+        /// </summary>
         /// <param name="threshold">The threshold.</param>
         /// <returns>The number of days less than a threshold since first positive test date</returns>
-        public int FindNumberOfDaysSinceFirstPositiveTestLessThanThreshold(int threshold)
+        public int FindNumberOfDaysForPositiveTestsLessThanThreshold(int threshold)
         {
+            if (threshold < 0)
+            {
+                throw new ArgumentException($"{nameof(threshold)} can not be less than 0");
+            }
             var firstDateWithPositive = this.FindDayOfFirstPositiveTest();
             var daysGreaterThanThreshold = this.CovidRecords.Count(record => record.Date.Date >= firstDateWithPositive && record.PositiveTests < threshold);
             return daysGreaterThanThreshold;
@@ -166,7 +180,7 @@ namespace Covid19Analysis.Model
                 return record.PositiveTests / Format.FormatIntegerToDouble(totalTests);
             }
 
-            return 0;
+            return double.NaN;
         }
         #endregion
     }

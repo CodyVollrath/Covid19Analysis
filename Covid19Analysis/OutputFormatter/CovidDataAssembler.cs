@@ -146,16 +146,16 @@ namespace Covid19Analysis.OutputFormatter
             this.Summary += stateSummary.GetFirstDayOfPositiveTest();
             this.Summary += stateSummary.GetHighestPositiveWithDate();
             this.Summary += stateSummary.GetHighestNegativeWithDate();
+
             this.Summary += stateSummary.GetHighestTotalTestsWithDate();
             this.Summary += stateSummary.GetHighestDeathsWithDate();
             this.Summary += stateSummary.GetHighestHospitalizationsWithDate();
-            this.Summary += stateSummary.GetHighestPercentageOfTestsPerDayWithDate();
 
+            this.Summary += stateSummary.GetHighestPercentageOfTestsPerDayWithDate();
             this.Summary += stateSummary.GetAveragePositiveTestsSinceFirstPositiveTest();
             this.Summary += stateSummary.GetOverallPositivityRateSinceFirstPositiveTest();
 
             this.Summary += this.getPositiveThresholds(stateSummary);
-
             this.Summary += stateSummary.GetTheFrequencyTableHistogramOfPositiveTests();
             this.Summary += stateSummary.GetMonthlySummary();
         }

@@ -157,7 +157,7 @@ namespace Covid19Analysis.OutputFormatter
         public string GetTheDaysFromTheFirstPositiveTestGreaterThanThreshold(int threshold)
         {
             var daysGreaterThanThreshold =
-                this.covidStatistics.FindNumberOfDaysSinceFirstPositiveTestGreaterThanThreshold(threshold);
+                this.covidStatistics.FindNumberOfDaysForPositiveTestsGreaterThanThreshold(threshold);
 
             var days = Format.FormatIntegerAsFormattedString(daysGreaterThanThreshold);
             var thresholdFormatted = Format.FormatIntegerAsFormattedString(threshold);
@@ -169,7 +169,7 @@ namespace Covid19Analysis.OutputFormatter
         public string GetTheDaysFromTheFirstPositiveTestLessThanThreshold(int threshold)
         {
             var daysLessThanThreshold =
-                this.covidStatistics.FindNumberOfDaysSinceFirstPositiveTestLessThanThreshold(threshold);
+                this.covidStatistics.FindNumberOfDaysForPositiveTestsLessThanThreshold(threshold);
 
             var days = Format.FormatIntegerAsFormattedString(daysLessThanThreshold);
             var thresholdFormatted = Format.FormatIntegerAsFormattedString(threshold);
