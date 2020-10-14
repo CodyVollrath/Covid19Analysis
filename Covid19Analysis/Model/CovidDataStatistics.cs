@@ -108,14 +108,14 @@ namespace Covid19Analysis.Model
         {
             var firstDateWithPositive = this.FindDayOfFirstPositiveTest();
             var averagePositiveTests = this.CovidRecords
-                              .Where(record => record.Date.Date >= firstDateWithPositive)
+                              .Where(record => record.Date >= firstDateWithPositive)
                               .Select(record => record.PositiveTests).Average();
             return averagePositiveTests;
         }
 
 
         /// <summary>Finds the overall positivity rate since first positive test.</summary>
-        /// <returns>The overall positivty rate since first positive test date</returns>
+        /// <returns>The overall positivity rate since first positive test date</returns>
         public double FindOverallPositivityRateSinceFirstPositiveTest()
         {
             var firstDateWithPositive = this.FindDayOfFirstPositiveTest();

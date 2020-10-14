@@ -6,7 +6,7 @@ namespace Covid19AnalysisTests.CovidDataStatisticsTests
 {
     /// <summary>
     /// <para>
-    ///  Testing The functionality of the FindRecordWithHighestPositiveCases Method in the CovidDataStatistics class
+    ///  Testing The functionality of the TestFindDayOfFirstPositiveTest Method in the CovidDataStatistics class
     /// </para>
     /// <para>TestCase: TestEmptyCovidDataCollection</para>
     ///	<para>Input: {}  ExpectedOutput:InvalidOperationException</para>
@@ -27,7 +27,7 @@ namespace Covid19AnalysisTests.CovidDataStatisticsTests
     /// <para>Input:{record1.PositiveTests = 1, record2.PositiveTests = 0, record3.PositiveTests = 0} ExpectedOutput: record1.Date</para>
     /// </summary>
     [TestClass]
-    public class TestFindFirstDateOfPositiveTest
+    public class TestFindDayOfFirstPositiveTest
     {
         #region Private Members
         private DateTime inputDate1;

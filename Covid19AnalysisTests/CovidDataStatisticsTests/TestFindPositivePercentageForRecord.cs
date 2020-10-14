@@ -6,7 +6,7 @@ namespace Covid19AnalysisTests.CovidDataStatisticsTests
 {
     /// <summary>
     ///   <para>
-    ///    Testing The functionality of the FindRecordWithHighestPositiveCases Method in the CovidDataStatistics class
+    ///    Testing The functionality of the FindPositivePercentageForRecord Method in the CovidDataStatistics class
     ///   </para>
     ///   <para>TestCase: TestZeroPositives</para>
     ///	  <para>Input:record1.TotalTests = 0  ExpectedOutput:Double.NaN</para>

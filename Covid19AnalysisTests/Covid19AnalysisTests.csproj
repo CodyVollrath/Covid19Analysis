@@ -119,8 +119,10 @@
     <SDKReference Include="TestPlatform.Universal, Version=$(UnitTestPlatformVersion)" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CovidDataStatisticsTests\TestFindDayOfFirstPositiveTests.cs" />
-    <Compile Include="CovidDataStatisticsTests\TestFindFirstDateOfPositiveTest.cs" />
+    <Compile Include="CovidDataCollectionTests\TestReplaceDuplicateRecords.cs" />
+    <Compile Include="CovidDataStatisticsTests\TestFindAveragePositiveTestsSinceFirstPositiveTest.cs" />
+    <Compile Include="CovidDataStatisticsTests\TestFindRecordWithHighestPositveCases.cs" />
+    <Compile Include="CovidDataStatisticsTests\TestFindDayOfFirstPositiveTest.cs" />
     <Compile Include="CovidDataStatisticsTests\TestFindPositivePercentageForRecord.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitTestApp.xaml.cs">
@@ -164,7 +166,6 @@
       <Name>Covid19Analysis</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

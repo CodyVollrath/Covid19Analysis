@@ -29,18 +29,31 @@ namespace Covid19Analysis.Model
         #endregion
 
         #region Public Methods
+
+        public CovidRecord this[int index]
+        {
+            get => ((List<CovidRecord>)this.CovidRecords)[index];
+            set => ((List<CovidRecord>)this.CovidRecords)[index] = value;
+        }
+
         /// <Summary>
         /// Replaces the record with the matching date and state and then swaps it for the record that is passed in.
         /// <code>Precondition: record != null</code>
         /// </Summary>
         /// <param name="record">The record.</param>
-        public void ReplaceDuplicateRecords(CovidRecord record)
+        /// <returns>True if the record was replaced, otherwise False.</returns>
+        /// <exception cref="ArgumentNullException">record</exception>
+        public bool ReplaceDuplicateRecords(CovidRecord record)
         {
             record = record ?? throw new ArgumentNullException(nameof(record));
-            this.CovidRecords.Remove(record);
-            this.CovidRecords.Add(record);
-        }
+            var isCovidRecordPresentInCollection = this.CovidRecords.Remove(record);
+            if (isCovidRecordPresentInCollection)
+            {
+                this.CovidRecords.Add(record);
+            }
 
+            return isCovidRecordPresentInCollection;
+        }
 
         /// <summary>Replaces all current records with a new covid collection.
         /// <code>Postcondition: CovidRecord == covidRecords</code>
