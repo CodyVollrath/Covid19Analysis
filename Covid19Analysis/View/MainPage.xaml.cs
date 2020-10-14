@@ -95,6 +95,12 @@ namespace Covid19Analysis.View
             this.summaryTextBox.Text = this.covidDataAssembler.GetCovidDataErrors();
         }
 
+        private void clearData_Click(object sender, RoutedEventArgs e)
+        {
+            this.covidDataAssembler.Reset();
+            this.summaryTextBox.Text = string.Empty;
+        }
+
         private void upperPositiveCaseTextBox_BeforeTextChanging(TextBox sender, TextBoxBeforeTextChangingEventArgs args)
         {
             args.Cancel = args.NewText.Any(c => !char.IsDigit(c));

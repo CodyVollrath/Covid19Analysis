@@ -21,9 +21,11 @@
 
         <TextBlock Text="Upper Positive Case Threshold:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,376,0,0" Height="18" Width="196"/>
         <TextBox x:Name="upperPositiveCaseTextBox" Text="2500" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="229,369,0,0"  MaxLength="9" LostFocus="upperPositiveCaseTextBox_LostFocus" BeforeTextChanging="upperPositiveCaseTextBox_BeforeTextChanging" ToolTipService.ToolTip="Applies a threshold to positive values that are GREATER than it. Default is 2500"/>
+        <Button x:Name="clearData" Content="Clear Data" Margin="340,369,0,0" VerticalAlignment="Top" Click="clearData_Click"/>
 
         <TextBlock Text="Lower Positive Case Threshold:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,431,0,0" Width="200" Height="18"/>
         <TextBox x:Name="lowerPositiveCaseTextBox" Text="1000"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="229,424,0,0" MaxLength="9"  LostFocus="lowerPositiveCaseTextBox_LostFocus" BeforeTextChanging="lowerPositiveCaseTextBox_BeforeTextChanging" ToolTipService.ToolTip="Applies a threshold to positive values that are LESS than it. Default is 1000" />
+        
 
     </Grid>
 </Page>

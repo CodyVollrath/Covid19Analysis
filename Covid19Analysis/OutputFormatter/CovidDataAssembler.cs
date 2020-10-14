@@ -59,16 +59,22 @@ namespace Covid19Analysis.OutputFormatter
         public CovidDataAssembler(string stateFilter = Assets.GeorgiaFilterValue)
         {
             this.StateFilter = stateFilter;
+            this.Reset();
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>Resets this instance to the start value.</summary>
+        public void Reset()
+        {
             this.Summary = string.Empty;
             this.IsCovidDataLoaded = false;
             this.covidErrorLogger = null;
             this.loadedCovidDataCollection = null;
             this.mergeController = null;
         }
-
-        #endregion
-
-        #region Public Methods
 
         /// <Summary>Gets the covid data errors.</Summary>
         /// <returns>
