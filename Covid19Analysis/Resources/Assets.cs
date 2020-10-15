@@ -19,6 +19,8 @@ namespace Covid19Analysis.Resources
         public const string DateStringFormatted = "MM/dd/yyyy";
 
         public const string MonthNameIdentifier = "MMMM";
+
+        public const string NoCovidDataText = "No CovidData in the dataset";
         #endregion
 
         #region Prompt Labels

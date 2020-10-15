@@ -22,6 +22,7 @@ namespace Covid19Analysis.OutputFormatter
         #region Private Members
         private CovidDataStatistics covidStatistics;
         #endregion
+
         #region Constructors
 
         /// <Summary>
@@ -49,12 +50,11 @@ namespace Covid19Analysis.OutputFormatter
         /// <Summary>Gets the first day of positive test.</Summary>
         /// <returns>The formatted string of the first day of the positive test</returns>
         public string GetFirstDayOfPositiveTest()
-        {
-            var firstDayOfPositiveTest = this.covidStatistics.FindDayOfFirstPositiveTest();
-
+        { 
+            var firstDayOfPositiveTest = this.covidStatistics.FindDayOfFirstPositiveTest(); 
             var dayOfFirstPositiveTest = $"{Assets.FirstDayOfPositiveTestLabel} " +
-                                         $"{firstDayOfPositiveTest.ToString(Assets.DateStringFormatted)}" +
-                                         $"{Environment.NewLine}";
+                                             $"{firstDayOfPositiveTest.ToString(Assets.DateStringFormatted)}" +
+                                             $"{Environment.NewLine}";
             return dayOfFirstPositiveTest;
         }
 
@@ -118,10 +118,11 @@ namespace Covid19Analysis.OutputFormatter
         public string GetHighestPercentageOfTestsPerDayWithDate()
         {
             var highestPercentageRecord = this.covidStatistics.FindRecordWithHighestPercentageOfPositiveTests();
-
-            var highestPercentage = Format.FormatNumericValueAsPercentage(CovidDataStatistics.FindPositivePercentageForRecord(highestPercentageRecord));
-            var date = highestPercentageRecord.Date.ToString(Assets.DateStringFormatted);
+            var positivePercentage = CovidDataStatistics.FindPositivePercentageForRecord(highestPercentageRecord);
+            var highestPercentage = Format.FormatNumericValueAsPercentage(positivePercentage);
+            var date = highestPercentageRecord.Date.ToString(Assets.DateStringFormatted); 
             return CovidDataLines.GetCovidLineForValueAndDate(Assets.HighestPercentageOfPositiveCasesLabel, highestPercentage, date);
+            
         }
 
 
@@ -134,9 +135,7 @@ namespace Covid19Analysis.OutputFormatter
         public string GetAveragePositiveTestsSinceFirstPositiveTest()
         {
             var averagePositiveTest = this.covidStatistics.FindAveragePositiveTestsSinceFirstPositiveTest();
-
             var average = Format.FormatAveragesWithTwoDecimalPlaces(averagePositiveTest);
-
             return CovidDataLines.GetCovidLineForValue(Assets.AveragePositiveTestsLabel, average);
         }
 

@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using Windows.Foundation;
 using Windows.Storage.Pickers;
-using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -167,7 +166,8 @@ namespace Covid19Analysis.View
             }
             catch (Exception exception)
             {
-                alertBox(exception.Message, Assets.BadCovidDataFileAlert);
+                Console.WriteLine(exception);
+                this.summaryTextBox.Text = Assets.NoCovidDataText;
             }
         }
 
@@ -223,11 +223,6 @@ namespace Covid19Analysis.View
             this.summaryTextBox.Text = this.covidDataAssembler.Summary;
         }
 
-        private static void alertBox(string content, string title)
-        {
-            var dialogBox = new MessageDialog(content, title);
-            var dummy = dialogBox.ShowAsync();
-        }
         private void updateCovidData()
         {
             if (!this.covidDataAssembler.IsCovidDataLoaded)
