@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace Covid19Analysis.Resources
 {
     /// <Summary>This class contains static constants that are used frequently in the Covid19 Analysis application.</Summary>

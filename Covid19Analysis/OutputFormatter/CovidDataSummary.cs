@@ -183,17 +183,16 @@ namespace Covid19Analysis.OutputFormatter
 
         /// <summary>Gets the frequency table histogram of positive tests.</summary>
         /// <returns>The histogram of the positive tests</returns>
-        public string GetTheFrequencyTableHistogramOfPositiveTests()
+        public string GetTheFrequencyTableHistogramOfPositiveTests(int binSize)
         {
             var positiveTests = (from record in this.CovidRecords
                                  where record.Date.Date >= this.getDateOfFirstPositiveTest()
                                  orderby record.PositiveTests descending
                                  select record.PositiveTests).ToList();
-            var histogramGenerator = new CovidDataHistogramGenerator(positiveTests);
+            var histogramGenerator = new CovidDataHistogramGenerator(positiveTests, binSize);
             var histogram = $"{Environment.NewLine}{Assets.HistogramLabel}{Environment.NewLine}";
             histogram += histogramGenerator.GenerateHistogram();
             return histogram;
-
         }
 
         /// <summary>Gets the monthly summary.</summary>

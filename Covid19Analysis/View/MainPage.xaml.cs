@@ -111,16 +111,41 @@ namespace Covid19Analysis.View
             args.Cancel = args.NewText.Any(c => !char.IsDigit(c));
         }
 
+        private void binSizeTextBox_BeforeTextChanging(TextBox sender, TextBoxBeforeTextChangingEventArgs args)
+        {
+            args.Cancel = args.NewText.Any(c => !char.IsDigit(c));
+        }
+
         private void upperPositiveCaseTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
+            var isUpperPositiveCaseTextBoxEmpty = this.upperPositiveCaseTextBox.Text.Equals(string.Empty);
+            if (isUpperPositiveCaseTextBoxEmpty)
+            {
+                this.upperPositiveCaseTextBox.Text = Assets.DefaultGreaterThanThreshHold.ToString();
+            }
             this.updateCovidData();
         }
 
         private void lowerPositiveCaseTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
+            var isLowerPositiveCaseTextBoxEmpty = this.lowerPositiveCaseTextBox.Text.Equals(string.Empty);
+            if (isLowerPositiveCaseTextBoxEmpty)
+            {
+                this.lowerPositiveCaseTextBox.Text = Assets.DefaultLessThanThreshold.ToString();
+            }
             this.updateCovidData();
         }
 
+        private void binSizeTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var isBinSizeNotValid = this.binSizeTextBox.Text.Equals(string.Empty) || this.binSizeTextBox.Text.Equals("0");
+            if (isBinSizeNotValid)
+            {
+                this.binSizeTextBox.Text = Assets.RangeWidth.ToString();
+            }
+
+            this.updateCovidData();
+        }
         #endregion
 
         #region Private Helpers
@@ -130,6 +155,7 @@ namespace Covid19Analysis.View
             try
             {
                 this.applyThresholds();
+                this.applyBinSize();
                 if (this.covidDataAssembler.IsCovidDataLoaded)
                 {
                     this.promptMergeOrReplaceDialog(textContent);
@@ -209,6 +235,7 @@ namespace Covid19Analysis.View
                 return;
             }
             this.applyThresholds();
+            this.applyBinSize();
             this.loadCovidData(this.currentTextContent);
         }
 
@@ -217,6 +244,12 @@ namespace Covid19Analysis.View
             this.covidDataAssembler.UpperPositiveThreshold = this.upperPositiveCaseTextBox.Text;
             this.covidDataAssembler.LowerPositiveThreshold = this.lowerPositiveCaseTextBox.Text;
         }
+
+        private void applyBinSize()
+        {
+            this.covidDataAssembler.BinSize = this.binSizeTextBox.Text;
+        }
+
         #endregion
 
     }

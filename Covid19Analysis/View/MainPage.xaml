@@ -25,7 +25,9 @@
 
         <TextBlock Text="Lower Positive Case Threshold:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,431,0,0" Width="200" Height="18"/>
         <TextBox x:Name="lowerPositiveCaseTextBox" Text="1000"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="229,424,0,0" MaxLength="9"  LostFocus="lowerPositiveCaseTextBox_LostFocus" BeforeTextChanging="lowerPositiveCaseTextBox_BeforeTextChanging" ToolTipService.ToolTip="Applies a threshold to positive values that are LESS than it. Default is 1000" />
-        
+        <TextBox x:Name="binSizeTextBox" HorizontalAlignment="Left" Margin="414,424,0,0" Text="500" TextWrapping="Wrap" VerticalAlignment="Top" Width="71" MaxLength="9" LostFocus="binSizeTextBox_LostFocus" BeforeTextChanging="binSizeTextBox_BeforeTextChanging" ToolTipService.ToolTip="Applies a bin size to the histogram. Default is 500"/>
+        <TextBlock HorizontalAlignment="Left" Margin="340,431,0,0" Text="Bin Size:" TextWrapping="Wrap" VerticalAlignment="Top"/>
+
 
     </Grid>
 </Page>

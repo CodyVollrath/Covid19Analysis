@@ -33,6 +33,11 @@ namespace Covid19Analysis.OutputFormatter
         public string LowerPositiveThreshold { get; set; }
 
 
+        /// <summary>Gets or sets the size of the bin for the histogram.</summary>
+        /// <value>The size of the bin.</value>
+        public string BinSize { get; set; }
+
+
         /// <summary>Gets the covid data summary.</summary>
         /// <value>The summary.</value>
         public string Summary { get; private set; }
@@ -162,27 +167,25 @@ namespace Covid19Analysis.OutputFormatter
             this.Summary += stateSummary.GetOverallPositivityRateSinceFirstPositiveTest();
 
             this.Summary += this.getPositiveThresholds(stateSummary);
-            this.Summary += stateSummary.GetTheFrequencyTableHistogramOfPositiveTests();
+            this.Summary += this.getHistogram(stateSummary);
             this.Summary += stateSummary.GetMonthlySummary();
         }
 
         private string getPositiveThresholds(CovidDataSummary stateSummary)
         {
-            var upperPositiveCaseThreshold = Assets.DefaultGreaterThanThreshHold;
-            var lowerPositiveCaseThreshold = Assets.DefaultLessThanThreshold;
-            if (this.UpperPositiveThreshold != null && !this.UpperPositiveThreshold.Equals(string.Empty))
-            {
-                upperPositiveCaseThreshold = Format.FormatStringToInteger(this.UpperPositiveThreshold);
-            }
-
-            if (this.LowerPositiveThreshold != null && !this.LowerPositiveThreshold.Equals(string.Empty))
-            {
-                lowerPositiveCaseThreshold = Format.FormatStringToInteger(this.LowerPositiveThreshold);
-            }
-
+            var upperPositiveCaseThreshold = Format.FormatStringToInteger(this.UpperPositiveThreshold);
+            var lowerPositiveCaseThreshold = Format.FormatStringToInteger(this.LowerPositiveThreshold);
             var summary = string.Empty;
             summary += stateSummary.GetTheDaysFromTheFirstPositiveTestGreaterThanThreshold(upperPositiveCaseThreshold);
             summary += stateSummary.GetTheDaysFromTheFirstPositiveTestLessThanThreshold(lowerPositiveCaseThreshold);
+            return summary;
+        }
+
+        private string getHistogram(CovidDataSummary stateSummary)
+        {
+            var binSize = Format.FormatStringToInteger(this.BinSize);
+            var summary = string.Empty;
+            summary += stateSummary.GetTheFrequencyTableHistogramOfPositiveTests(binSize);
             return summary;
         }
 

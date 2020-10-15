@@ -9,7 +9,17 @@ namespace Covid19Analysis.OutputFormatter
     /// <Summary>This class creates a histogram Summary of a passed in collection of numeric Covid data</Summary>
     public class CovidDataHistogramGenerator
     {
+        #region Properties
 
+        /// <summary>Gets the size of the bin for the histogram.</summary>
+        /// <value>The size of the bin.</value>
+        public int BinSize { get; }
+
+        /// <summary>Gets the numeric covid data as a list of numeric values related to covid data.</summary>
+        /// <value>The numeric covid data as a list of numeric values.</value>
+        public List<int> CollectionOfNumericValues { get; }
+
+        #endregion
         #region Inner Classes
 
         /// <summary>This Inner class keeps track of the range values for individual ranges in the histogram</summary>
@@ -39,19 +49,18 @@ namespace Covid19Analysis.OutputFormatter
         #endregion
 
         #region Public Methods
-        /// <summary>Gets the numeric covid data as a list of numeric values related to covid data.</summary>
-        /// <value>The numeric covid data as a list of numeric values.</value>
-        public List<int> CollectionOfNumericValues { get; }
 
         /// <Summary>
         /// Initializes a new instance of the <a onclick="return false;" href="CovidDataHistogram" originaltag="see">CovidDataHistogram</a> class.
         /// <code>Precondition: collection != null</code>
-        /// <code>Postcondition: CollectionOfCovidRecords == collection</code>
+        /// <code>Postcondition: CollectionOfCovidRecords == collection AND BinSize == binSize</code>
         /// </Summary>
         /// <param name="collection">The collection.</param>
-        public CovidDataHistogramGenerator(List<int> collection)
+        /// <param name="binSize">The size of the bin</param>
+        public CovidDataHistogramGenerator(List<int> collection, int binSize)
         {
             this.CollectionOfNumericValues = collection ?? throw new ArgumentNullException(nameof(collection));
+            this.BinSize = binSize;
             this.HighestValueInHistogram = this.convertHighestValueToMultipleOfRangeWidth();
         }
 
@@ -72,7 +81,7 @@ namespace Covid19Analysis.OutputFormatter
         {
             this.CollectionOfNumericValues.Sort();
             var highestCombinedTest = this.CollectionOfNumericValues[this.CollectionOfNumericValues.Count - 1];
-            while (highestCombinedTest % Assets.RangeWidth != 0)
+            while (highestCombinedTest % this.BinSize != 0)
             {
                 highestCombinedTest++;
             }
@@ -82,19 +91,19 @@ namespace Covid19Analysis.OutputFormatter
         private IEnumerable<Range> getCollectionOfRanges()
         {
             var maxRange = this.HighestValueInHistogram;
-            var minRange = maxRange - (Assets.RangeWidth - 1);
+            var minRange = maxRange - (this.BinSize - 1);
             var collectionOfRanges = new List<Range>() { new Range(minRange, maxRange) };
-            while (minRange > 0 && maxRange > Assets.RangeWidth)
+            while (minRange > 0 && maxRange > this.BinSize)
             {
-                if (minRange == Assets.RangeWidth + 1)
+                if (minRange == this.BinSize + 1)
                 {
                     minRange = 0;
                 }
                 else
                 {
-                    minRange -= Assets.RangeWidth;
+                    minRange -= this.BinSize;
                 }
-                maxRange -= Assets.RangeWidth;
+                maxRange -= this.BinSize;
                 var range = new Range(minRange, maxRange);
                 collectionOfRanges.Add(range);
             }
