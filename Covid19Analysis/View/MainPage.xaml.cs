@@ -137,8 +137,10 @@ namespace Covid19Analysis.View
 
         private void binSizeTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            var isBinSizeNotValid = this.binSizeTextBox.Text.Equals(string.Empty) || this.binSizeTextBox.Text.Equals("0");
-            if (isBinSizeNotValid)
+            var isBinSizeEmpty = this.binSizeTextBox.Text.Equals(string.Empty);
+            var binSize = Format.FormatStringToInteger(this.binSizeTextBox.Text);
+            var isBinLessThanOrEqualZero = binSize <= 0;
+            if (isBinSizeEmpty || isBinLessThanOrEqualZero)
             {
                 this.binSizeTextBox.Text = Assets.RangeWidth.ToString();
             }
