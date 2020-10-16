@@ -12,7 +12,7 @@ namespace Covid19Analysis.OutputFormatter
         #region Properties
         /// <Summary>Gets the covid records.</Summary>
         /// <value>The covid records.</value>
-        public CovidDataCollection CovidRecords { get; private set; }
+        public CovidDataCollection CovidRecords { get; }
 
         /// <summary>Gets the state filter of the covid data collection.</summary>
         /// <value>The state filter.</value>
@@ -20,7 +20,7 @@ namespace Covid19Analysis.OutputFormatter
         #endregion
 
         #region Private Members
-        private CovidDataStatistics covidStatistics;
+        private readonly CovidDataStatistics covidStatistics;
         #endregion
 
         #region Constructors
@@ -206,17 +206,6 @@ namespace Covid19Analysis.OutputFormatter
         #endregion
 
         #region Private Helpers
-        private static double findPercentageForRecord(CovidRecord record)
-        {
-            var totalTests = record.TotalTests;
-            if (totalTests != 0)
-            {
-                return record.PositiveTests / Format.FormatIntegerToDouble(totalTests);
-            }
-
-            return 0;
-        }
-
         private DateTime getDateOfFirstPositiveTest()
         {
             var firstDateOfPositiveTestRecord = (from record in this.CovidRecords

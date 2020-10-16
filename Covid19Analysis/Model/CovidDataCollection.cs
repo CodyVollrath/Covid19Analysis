@@ -30,6 +30,11 @@ namespace Covid19Analysis.Model
 
         #region Public Methods
 
+
+        /// <summary>Gets or sets the <see cref="CovidRecord" /> at the specified index.</summary>
+        /// <param name="index">The index.</param>
+        /// <value>The <see cref="CovidRecord" />.</value>
+        /// <returns>The element at the specified index</returns>
         public CovidRecord this[int index]
         {
             get => ((List<CovidRecord>)this.CovidRecords)[index];
@@ -62,6 +67,38 @@ namespace Covid19Analysis.Model
         public void ReplaceAllWithNewCovidCollection(List<CovidRecord> covidRecords)
         {
             this.CovidRecords = covidRecords;
+        }
+
+        /// <summary>Clones this instance.</summary>
+        /// <returns>The Cloned instance of the covid data collection</returns>
+        public CovidDataCollection Clone()
+        {
+            var clonedCollection = new CovidDataCollection();
+            foreach (var record in this.CovidRecords)
+            {
+                clonedCollection.Add(record);
+            }
+
+            return clonedCollection;
+        }
+
+
+        /// <summary>Adds all.
+        /// <code>Precondition: covidRecords != null</code>
+        /// <code>Postcondition: CovidRecords.Count() += covidRecords.Count()</code>
+        /// </summary>
+        /// <param name="covidRecords">The covid records.</param>
+        /// <exception cref="ArgumentNullException">covidRecords</exception>
+        public void AddAll(IEnumerable<CovidRecord> covidRecords)
+        {
+            covidRecords = covidRecords ?? throw new ArgumentNullException(nameof(covidRecords));
+            foreach (var record in covidRecords)
+            {
+                if (!this.ReplaceDuplicateRecords(record))
+                {
+                    this.Add(record);
+                }
+            }
         }
 
         #endregion
@@ -103,7 +140,7 @@ namespace Covid19Analysis.Model
         }
 
         /// <Summary>
-        /// Copies the elements of the CovidDataCollection   to an <a onclick="return false;" href="T:System.Array" originaltag="see">Array</a>, starting at a particular <a onclick="return false;" href="T:System.Array" originaltag="see">Array</a> index.
+        /// Copies the elements of the CovidDataCollection to an <a onclick="return false;" href="T:System.Array" originaltag="see">Array</a>, starting at a particular <a onclick="return false;" href="T:System.Array" originaltag="see">Array</a> index.
         /// </Summary>
         /// <param name="array">
         /// The one-dimensional <a onclick="return false;" href="T:System.Array" originaltag="see">Array</a> that is the destination of the elements copied from CovidDataCollection  . The <a onclick="return false;" href="T:System.Array" originaltag="see">Array</a> must have zero-based indexing.
@@ -140,6 +177,5 @@ namespace Covid19Analysis.Model
             return this.CovidRecords.AsEnumerable().GetEnumerator();
         }
         #endregion
-
     }
 }

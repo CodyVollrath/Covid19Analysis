@@ -69,6 +69,9 @@ namespace Covid19Analysis.View
         #endregion
 
         #region Action Events
+
+        #region AppButtonEvents
+
         private async void loadFile_ClickAsync(object sender, RoutedEventArgs e)
         {
             string fileContent;
@@ -94,6 +97,33 @@ namespace Covid19Analysis.View
             this.summaryTextBox.Text = this.covidDataAssembler.GetCovidDataErrors();
         }
 
+        private async void saveFile_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            if (!this.covidDataAssembler.IsCovidDataLoaded)
+            {
+                return;
+            }
+
+            var savePicker = new FileSavePicker
+            {
+                SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+                SuggestedFileName = $"Covid19Analysis_{DateTime.Now.ToString(Assets.TimeStamp)}"
+            };
+            savePicker.FileTypeChoices.Add("Plain Text", new List<string>() { ".csv", ".txt" });
+
+            var file = await savePicker.PickSaveFileAsync();
+            if (file == null)
+            {
+                return;
+            }
+
+            var isFileSaved = this.covidDataAssembler.WriteCovidDataToFile(file);
+            showSaveSuccessfulPrompt(isFileSaved);
+        }
+
+        #endregion
+
+        #region Elements on UI Events
         private void clearData_Click(object sender, RoutedEventArgs e)
         {
             this.covidDataAssembler.Reset();
@@ -147,6 +177,9 @@ namespace Covid19Analysis.View
 
             this.updateCovidData();
         }
+
+        #endregion
+
         #endregion
 
         #region Private Helpers
@@ -190,7 +223,12 @@ namespace Covid19Analysis.View
         {
             this.covidDataAssembler.MergeAndLoadCovidData(textContent);
             var duplicates = this.covidDataAssembler.GetDuplicatesFromMergedData();
-            this.keepOrReplaceDialog(duplicates);
+            var covidRecords = duplicates as CovidRecord[] ?? duplicates.ToArray();
+            if (covidRecords.Any())
+            {
+                this.keepOrReplaceDialog(covidRecords);
+            }
+            this.summaryTextBox.Text = this.covidDataAssembler.Summary;
         }
 
         private async void keepOrReplaceDialog(IEnumerable<CovidRecord> duplicates)
@@ -215,14 +253,6 @@ namespace Covid19Analysis.View
                     }
                 }
             }
-            this.summaryTextBox.Text = this.covidDataAssembler.Summary;
-
-        }
-
-        private void loadCovidData(string textContent)
-        {
-            this.covidDataAssembler.LoadCovidData(textContent);
-            this.summaryTextBox.Text = this.covidDataAssembler.Summary;
         }
 
         private void updateCovidData()
@@ -247,7 +277,30 @@ namespace Covid19Analysis.View
             this.covidDataAssembler.BinSize = this.binSizeTextBox.Text;
         }
 
-        #endregion
+        private void loadCovidData(string textContent)
+        {
+            this.covidDataAssembler.LoadCovidData(textContent);
+            this.summaryTextBox.Text = this.covidDataAssembler.Summary;
+        }
 
+        private static async void showSaveSuccessfulPrompt(bool didFileSaveProperly)
+        {
+            var title = "File Not Saved!";
+            var content = "The file that was attempted to be saved to could not be opened or failed to be created.";
+            if (didFileSaveProperly)
+            {
+                title = "Success!";
+                content = "File has been saved";
+            }
+
+            var isFileSavedDialog = new ContentDialog() {
+                Title = title,
+                Content = content,
+                CloseButtonText = "Ok"
+            };
+            await isFileSavedDialog.ShowAsync();
+        }
+
+        #endregion
     }
 }

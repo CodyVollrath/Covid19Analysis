@@ -121,6 +121,7 @@
     </Compile>
     <Compile Include="DataTier\CovidCsvParser.cs" />
     <Compile Include="DataTier\CovidDataMergeController.cs" />
+    <Compile Include="DataTier\CovidDataSaver.cs" />
     <Compile Include="Model\CovidDataStatistics.cs" />
     <Compile Include="OutputFormatter\CovidDataHistogramGenerator.cs" />
     <Compile Include="OutputFormatter\CovidDataSummary.cs" />

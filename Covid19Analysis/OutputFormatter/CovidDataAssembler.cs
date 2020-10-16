@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Windows.Storage;
 using Covid19Analysis.DataTier;
 using Covid19Analysis.Model;
 using Covid19Analysis.Resources;
@@ -49,6 +50,8 @@ namespace Covid19Analysis.OutputFormatter
 
         private CovidDataCollection loadedCovidDataCollection;
 
+        private CovidDataCollection allCovidData;
+
         private CovidDataMergeController mergeController;
         #endregion
 
@@ -78,6 +81,7 @@ namespace Covid19Analysis.OutputFormatter
             this.IsCovidDataLoaded = false;
             this.covidErrorLogger = null;
             this.loadedCovidDataCollection = null;
+            this.allCovidData = null;
             this.mergeController = null;
         }
 
@@ -99,6 +103,7 @@ namespace Covid19Analysis.OutputFormatter
             var parser = new CovidCsvParser(textContent);
             this.covidErrorLogger = parser.CovidErrorLogger;
             this.loadedCovidDataCollection = parser.GenerateCovidDataCollection();
+            this.allCovidData = this.loadedCovidDataCollection.Clone();
             this.IsCovidDataLoaded = true;
             this.buildCovidSummary();
         }
@@ -115,9 +120,9 @@ namespace Covid19Analysis.OutputFormatter
             var newCovidDataCollection = parser.GenerateCovidDataCollection();
 
             this.covidErrorLogger = parser.CovidErrorLogger;
-            this.mergeController = new CovidDataMergeController(this.loadedCovidDataCollection, newCovidDataCollection);
+            this.mergeController = new CovidDataMergeController(this.loadedCovidDataCollection, newCovidDataCollection, this.StateFilter);
             this.mergeController.AddAllNonDuplicates();
-
+            this.mergeAndRebuildAllCovidData();
         }
 
         /// <summary>Replaces the Covid covidRecord with the covidRecord passed in to it.</summary>
@@ -127,7 +132,7 @@ namespace Covid19Analysis.OutputFormatter
             this.mergeController.ReplaceDuplicate(covidRecord);
             this.loadedCovidDataCollection = this.mergeController.MergedCovidDataCollection;
             this.IsCovidDataLoaded = true;
-            this.buildCovidSummary();
+            this.mergeAndRebuildAllCovidData();
         }
 
 
@@ -136,8 +141,27 @@ namespace Covid19Analysis.OutputFormatter
         public IEnumerable<CovidRecord> GetDuplicatesFromMergedData()
         {
             var duplicates = this.mergeController.GetDuplicates();
-            var isDuplicatesNotEmpty = this.mergeController.GetDuplicates().Count > 0;
-            return isDuplicatesNotEmpty ? duplicates : null;
+            return duplicates;
+        }
+
+
+        /// <summary>Writes the covid data to file.</summary>
+        /// <param name="file">The file.</param>
+        /// <returns>True if the file was saved properly, otherwise false</returns>
+        public bool WriteCovidDataToFile(StorageFile file)
+        {
+            var isSaved = true;
+            try
+            {
+                var covidDataWriter = new CovidDataSaver(file, this.allCovidData);
+                covidDataWriter.WriteCovidDataToFile();
+            }
+            catch (Exception)
+            {
+                isSaved = false;
+            }
+            return isSaved;
+
         }
 
         #endregion
@@ -189,6 +213,11 @@ namespace Covid19Analysis.OutputFormatter
             return summary;
         }
 
+        private void mergeAndRebuildAllCovidData()
+        {
+            this.allCovidData.AddAll(this.mergeController.MergedCovidDataCollection);
+            this.buildCovidSummary();
+        }
         #endregion
 
     }

@@ -1,6 +1,4 @@
 ﻿
-using System;
-
 namespace Covid19Analysis.Resources
 {
     /// <Summary>This class contains static constants that are used frequently in the Covid19 Analysis application.</Summary>
@@ -18,6 +16,7 @@ namespace Covid19Analysis.Resources
         /// </Summary>
         public const string DateStringFormatted = "MM/dd/yyyy";
 
+        public const string TimeStamp = "MMddyyyyhhmmss";
         public const string MonthNameIdentifier = "MMMM";
 
         public const string NoCovidDataText = "No CovidData in the dataset";
@@ -49,6 +48,8 @@ namespace Covid19Analysis.Resources
         public const string HighestTotalTestsLabel = "Highest # total tests:";
         public const string LowestPositiveTestsLabel = "Lowest  # positive tests:";
         public const string LowestTotalTestsLabel = "Lowest  # total tests:";
+        public static readonly string[] HeadersForData = new string[] {"date", "state", "positiveIncrease", "negativeIncrease", "deathIncrease", "hospitalizedIncrease" };
+
         #endregion
 
         #region Filter Specifiers
@@ -81,7 +82,7 @@ namespace Covid19Analysis.Resources
         public const string MergeFilesTitle = "Merge Files?";
         public const string MergeFilesPrimaryButtonText = "Merge";
         public const string MergeFilesSecondaryButtonText = "Replace";
-        public const string BadCovidDataFileAlert = "Invalid Covid-19 analysis file";
+
         #endregion
 
     }

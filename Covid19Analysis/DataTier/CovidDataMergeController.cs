@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Covid19Analysis.Model;
+using Covid19Analysis.Resources;
 
 namespace Covid19Analysis.DataTier
 {
@@ -19,6 +20,8 @@ namespace Covid19Analysis.DataTier
         /// <value>The new covid data collection.</value>
         public CovidDataCollection NewCovidDataCollection { get; }
 
+        public string StateFilter { get; }
+
         #endregion
 
         #region Construtors
@@ -30,13 +33,16 @@ namespace Covid19Analysis.DataTier
         /// </summary>
         /// <param name="originalCollection">The original collection.</param>
         /// <param name="newCollection">The new collection.</param>
+        /// <param name="stateFilter">The state to filter by</param>
         /// <exception cref="ArgumentNullException">originalCollection
         /// or
         /// newCollection</exception>
-        public CovidDataMergeController(CovidDataCollection originalCollection, CovidDataCollection newCollection)
+        public CovidDataMergeController(CovidDataCollection originalCollection, CovidDataCollection newCollection, string stateFilter)
         {
             this.MergedCovidDataCollection = originalCollection ?? throw new ArgumentNullException(nameof(originalCollection));
+            this.StateFilter = stateFilter ?? throw new ArgumentNullException(nameof(stateFilter));
             this.NewCovidDataCollection = newCollection ?? throw new ArgumentNullException(nameof(newCollection));
+            this.applyFilter();
         }
 
         #endregion
@@ -53,9 +59,11 @@ namespace Covid19Analysis.DataTier
                 (from record in this.NewCovidDataCollection
                  where !this.isDuplicate(record)
                  select record).ToList();
+
             foreach (var record in nonDuplicates)
             {
                 this.MergedCovidDataCollection.Add(record);
+                this.NewCovidDataCollection.Remove(record);
             }
         }
 
@@ -65,8 +73,7 @@ namespace Covid19Analysis.DataTier
         /// <value>The duplicate records.</value>
         public List<CovidRecord> GetDuplicates()
         {
-            var duplicates = (from record in this.NewCovidDataCollection where this.isDuplicate(record) select record).ToList();
-            return duplicates;
+            return this.NewCovidDataCollection.ToList();
         }
 
 
@@ -87,6 +94,19 @@ namespace Covid19Analysis.DataTier
         {
             return this.MergedCovidDataCollection.Contains(record);
         }
+
+        private void applyFilter()
+        {
+            if (!FormatValidator.IsStateLabelValid(this.StateFilter))
+            {
+                return;
+            }
+
+            var filteredCovidCollection = this.NewCovidDataCollection.Where(record => record.State.Equals(this.StateFilter, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            this.NewCovidDataCollection.Clear();
+            this.NewCovidDataCollection.ReplaceAllWithNewCovidCollection(filteredCovidCollection);
+        }
+
         #endregion
 
     }
