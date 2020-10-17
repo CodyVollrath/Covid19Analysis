@@ -127,6 +127,9 @@
     <Compile Include="OutputFormatter\CovidDataSummary.cs" />
     <Compile Include="OutputFormatter\CovidDataMonthlySummary.cs" />
     <Compile Include="Resources\CovidDataLines.cs" />
+    <Compile Include="View\CovidRecordAdder.xaml.cs">
+      <DependentUpon>CovidRecordAdder.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -162,6 +165,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="View\CovidRecordAdder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

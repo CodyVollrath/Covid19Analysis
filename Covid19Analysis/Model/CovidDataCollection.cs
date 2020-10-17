@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Covid19Analysis.Resources;
 
 namespace Covid19Analysis.Model
 {
@@ -64,9 +65,9 @@ namespace Covid19Analysis.Model
         /// <code>Postcondition: CovidRecord == covidRecords</code>
         /// </summary>
         /// <param name="covidRecords">The covid records.</param>
-        public void ReplaceAllWithNewCovidCollection(List<CovidRecord> covidRecords)
+        public void ReplaceAllWithNewCovidCollection(ICollection<CovidRecord> covidRecords)
         {
-            this.CovidRecords = covidRecords;
+            this.CovidRecords = covidRecords.ToList();
         }
 
         /// <summary>Clones this instance.</summary>
@@ -99,6 +100,25 @@ namespace Covid19Analysis.Model
                     this.Add(record);
                 }
             }
+        }
+
+
+        /// <summary>Creates a filtered collection by state.</summary>
+        /// <param name="stateFilter">The state filter.</param>
+        /// <returns>the filtered collection by state if state is valid, and the original CovidData if state is invalid</returns>
+        public List<CovidRecord> CreateAFilteredCollection(string  stateFilter)
+        {
+            var collectionOfStates = this.CovidRecords.Select(record => record.State);
+            var isStateNotPresent = !collectionOfStates.Contains(stateFilter.ToUpper());
+            var isStateNotValid = !FormatValidator.IsStateLabelValid(stateFilter) || isStateNotPresent;
+
+            if (isStateNotValid)
+            {
+                return this.CovidRecords.ToList();
+            }
+
+            var filteredList = this.CovidRecords.Where(record => record.State.Equals(stateFilter, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            return filteredList;
         }
 
         #endregion

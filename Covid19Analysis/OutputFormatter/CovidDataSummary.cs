@@ -36,10 +36,10 @@ namespace Covid19Analysis.OutputFormatter
         /// <exception cref="ArgumentNullException">collection</exception>
         public CovidDataSummary(CovidDataCollection collection, string stateFilter)
         {
-            
             this.CovidRecords = collection ?? throw new ArgumentNullException(nameof(collection));
             this.StateFilter = stateFilter;
-            this.applyFilterToCovidCollection();
+            var filteredCollection = collection.CreateAFilteredCollection(stateFilter);
+            this.CovidRecords.ReplaceAllWithNewCovidCollection(filteredCollection);
             this.covidStatistics = new CovidDataStatistics(this.CovidRecords);
         }
 
@@ -214,19 +214,6 @@ namespace Covid19Analysis.OutputFormatter
                                                  select record).First();
             return firstDateOfPositiveTestRecord.Date;
         }
-
-        private void applyFilterToCovidCollection()
-        {
-            if (!FormatValidator.IsStateLabelValid(this.StateFilter))
-            {
-                return;
-            }
-
-            var filteredCovidCollection = this.CovidRecords.Where(record => record.State.Equals(this.StateFilter, StringComparison.InvariantCultureIgnoreCase)).ToList();
-            this.CovidRecords.Clear();
-            this.CovidRecords.ReplaceAllWithNewCovidCollection(filteredCovidCollection);
-        }
-
         #endregion
 
     }

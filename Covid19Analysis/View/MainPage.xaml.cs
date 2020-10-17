@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -39,8 +40,6 @@ namespace Covid19Analysis.View
         private readonly CovidDataAssembler covidDataAssembler;
 
         private readonly ContentDialog mergeOrReplaceDialog;
-
-        private string currentTextContent;
 
         #endregion
 
@@ -88,7 +87,6 @@ namespace Covid19Analysis.View
                 fileContent = await fileReader.ReadToEndAsync();
             }
 
-            this.currentTextContent = fileContent;
             this.displayCovidData(fileContent);
         }
 
@@ -128,6 +126,11 @@ namespace Covid19Analysis.View
         {
             this.covidDataAssembler.Reset();
             this.summaryTextBox.Text = string.Empty;
+        }
+
+        private void addCovidRecordButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.addCovidRecord();
         }
 
         private void upperPositiveCaseTextBox_BeforeTextChanging(TextBox sender, TextBoxBeforeTextChangingEventArgs args)
@@ -253,6 +256,7 @@ namespace Covid19Analysis.View
                     }
                 }
             }
+            this.summaryTextBox.Text = this.covidDataAssembler.Summary;
         }
 
         private void updateCovidData()
@@ -263,7 +267,8 @@ namespace Covid19Analysis.View
             }
             this.applyThresholds();
             this.applyBinSize();
-            this.loadCovidData(this.currentTextContent);
+            this.covidDataAssembler.UpdateSummary();
+            this.summaryTextBox.Text = this.covidDataAssembler.Summary;
         }
 
         private void applyThresholds()
@@ -280,6 +285,32 @@ namespace Covid19Analysis.View
         private void loadCovidData(string textContent)
         {
             this.covidDataAssembler.LoadCovidData(textContent);
+            this.summaryTextBox.Text = this.covidDataAssembler.Summary;
+        }
+
+        private async void addCovidRecord()
+        {
+            var covidRecordAdder = new CovidRecordAdder();
+            var result = await covidRecordAdder.ShowAsync();
+            this.applyThresholds();
+            this.applyBinSize();
+            if (result != ContentDialogResult.Primary)
+            {
+                return;
+            }
+
+            var newRecord = covidRecordAdder.CreatedRecord;
+            var isRecordDuplicate = this.covidDataAssembler.DoesCovidRecordExist(newRecord);
+            if (isRecordDuplicate)
+            {
+                var duplicates = new List<CovidRecord>() { newRecord };
+                this.keepOrReplaceDialog(duplicates);
+            }
+            else
+            {
+                this.covidDataAssembler.AddCovidRecordToCollection(newRecord);
+            }
+
             this.summaryTextBox.Text = this.covidDataAssembler.Summary;
         }
 

@@ -118,7 +118,6 @@ namespace Covid19Analysis.OutputFormatter
 
             var parser = new CovidCsvParser(textContent);
             var newCovidDataCollection = parser.GenerateCovidDataCollection();
-
             this.covidErrorLogger = parser.CovidErrorLogger;
             this.mergeController = new CovidDataMergeController(this.loadedCovidDataCollection, newCovidDataCollection, this.StateFilter);
             this.mergeController.AddAllNonDuplicates();
@@ -129,12 +128,53 @@ namespace Covid19Analysis.OutputFormatter
         /// <param name="covidRecord">The covidRecord.</param>
         public void ReplaceRecord(CovidRecord covidRecord)
         {
+            if (this.mergeController == null)
+            {
+                this.loadedCovidDataCollection.ReplaceDuplicateRecords(covidRecord);
+                this.allCovidData.ReplaceDuplicateRecords(covidRecord);
+                this.buildCovidSummary();
+                return;
+            }
+
             this.mergeController.ReplaceDuplicate(covidRecord);
             this.loadedCovidDataCollection = this.mergeController.MergedCovidDataCollection;
             this.IsCovidDataLoaded = true;
             this.mergeAndRebuildAllCovidData();
         }
 
+        public bool DoesCovidRecordExist(CovidRecord record)
+        {
+            var doesCovidRecordExist = false;
+            if (this.IsCovidDataLoaded)
+            {
+                doesCovidRecordExist = this.allCovidData.Contains(record);
+            }
+
+            return doesCovidRecordExist;
+        }
+
+        public void AddCovidRecordToCollection(CovidRecord record)
+        {
+            if (this.IsCovidDataLoaded)
+            {
+                if (record.State.Equals(this.StateFilter))
+                {
+                    this.loadedCovidDataCollection.Add(record);
+                    this.allCovidData.Add(record);
+                }
+                else
+                {
+                    this.allCovidData.Add(record);
+                }
+            }
+            else
+            {
+                this.loadedCovidDataCollection = new CovidDataCollection {record};
+                this.allCovidData = this.loadedCovidDataCollection.Clone();
+                this.IsCovidDataLoaded = true;
+            }
+            this.buildCovidSummary();
+        }
 
         /// <summary>Gets the duplicates from merged data.</summary>
         /// <returns>The duplicates from the merged data</returns>
@@ -161,7 +201,11 @@ namespace Covid19Analysis.OutputFormatter
                 isSaved = false;
             }
             return isSaved;
+        }
 
+        public void UpdateSummary()
+        {
+            this.buildCovidSummary();
         }
 
         #endregion

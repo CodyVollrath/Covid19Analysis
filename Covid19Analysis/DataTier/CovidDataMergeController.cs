@@ -42,7 +42,8 @@ namespace Covid19Analysis.DataTier
             this.MergedCovidDataCollection = originalCollection ?? throw new ArgumentNullException(nameof(originalCollection));
             this.StateFilter = stateFilter ?? throw new ArgumentNullException(nameof(stateFilter));
             this.NewCovidDataCollection = newCollection ?? throw new ArgumentNullException(nameof(newCollection));
-            this.applyFilter();
+            var filteredCollection = newCollection.CreateAFilteredCollection(stateFilter);
+            this.NewCovidDataCollection.ReplaceAllWithNewCovidCollection(filteredCollection);
         }
 
         #endregion
@@ -93,18 +94,6 @@ namespace Covid19Analysis.DataTier
         private bool isDuplicate(CovidRecord record)
         {
             return this.MergedCovidDataCollection.Contains(record);
-        }
-
-        private void applyFilter()
-        {
-            if (!FormatValidator.IsStateLabelValid(this.StateFilter))
-            {
-                return;
-            }
-
-            var filteredCovidCollection = this.NewCovidDataCollection.Where(record => record.State.Equals(this.StateFilter, StringComparison.InvariantCultureIgnoreCase)).ToList();
-            this.NewCovidDataCollection.Clear();
-            this.NewCovidDataCollection.ReplaceAllWithNewCovidCollection(filteredCovidCollection);
         }
 
         #endregion

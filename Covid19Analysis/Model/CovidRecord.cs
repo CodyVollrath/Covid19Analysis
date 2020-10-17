@@ -1,4 +1,5 @@
 ﻿using System;
+using Covid19Analysis.Resources;
 
 namespace Covid19Analysis.Model
 {
@@ -57,7 +58,8 @@ namespace Covid19Analysis.Model
         public CovidRecord(DateTime dateTime, string state)
         {
             this.Date = dateTime;
-            this.State = state ?? throw new ArgumentNullException(nameof(state));
+            state = state ?? throw new ArgumentNullException(nameof(state));
+            this.State = state.ToUpper();
         }
         #endregion
 
@@ -67,7 +69,7 @@ namespace Covid19Analysis.Model
         /// <returns>A <a onclick="return false;" href="System.String" originaltag="see">System.String</a> that represents this instance.</returns>
         public override string ToString()
         {
-            return $"Date: {this.Date}, State: {this.State}";
+            return $"Date: {this.Date.ToString(Assets.DateStringFormatted)}, State: {this.State}";
         }
 
         /// <summary>Returns a hash code for this instance.</summary>
