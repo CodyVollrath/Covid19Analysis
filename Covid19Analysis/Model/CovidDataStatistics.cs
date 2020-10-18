@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Covid19Analysis.Resources;
 
@@ -12,8 +13,7 @@ namespace Covid19Analysis.Model
 
         /// <summary>Gets the covid records.</summary>
         /// <value>The covid records.</value>
-        public CovidDataCollection CovidRecords { get; }
-
+        public IEnumerable<CovidRecord> CovidRecords { get; }
         #endregion
 
         #region Constructors
@@ -24,7 +24,7 @@ namespace Covid19Analysis.Model
         /// </summary>
         /// <param name="covidRecords">The covid records.</param>
         /// <exception cref="ArgumentNullException">covidRecords</exception>
-        public CovidDataStatistics(CovidDataCollection covidRecords)
+        public CovidDataStatistics(IEnumerable<CovidRecord> covidRecords)
         {
             this.CovidRecords = covidRecords ?? throw new ArgumentNullException(nameof(covidRecords));
         }
@@ -52,6 +52,15 @@ namespace Covid19Analysis.Model
         }
 
 
+        /// <summary>Finds the record with lowest positive cases.</summary>
+        /// <param name="sinceDate">The date indicator to not count the lowest.</param>
+        /// <returns>The record with the lowest positive cases</returns>
+        public CovidRecord FindRecordWithLowestPositiveCases(DateTime sinceDate)
+        {
+            var lowestPositiveTestCaseRecord = this.CovidRecords.Where(record => record.Date >= sinceDate).OrderBy(record => record.PositiveTests).First();
+            return lowestPositiveTestCaseRecord;
+        }
+
         /// <summary>Finds the record with highest negative tests.</summary>
         /// <returns>
         ///   <para>The CovidRecord with the highest negative tests.</para>
@@ -73,6 +82,16 @@ namespace Covid19Analysis.Model
             return highestTotalTestRecord;
         }
 
+
+
+        /// <summary>Finds the record with lowest total tests.</summary>
+        /// <param name="sinceDate">The date indicator to not count the lowest.</param>
+        /// <returns>The record with the lowest total cases</returns>
+        public CovidRecord FindRecordWithLowestTotalTests(DateTime sinceDate)
+        {
+            var lowestTotalTestRecord = this.CovidRecords.Where(record => record.Date >= sinceDate).OrderBy(record => record.TotalTests).First();
+            return lowestTotalTestRecord;
+        }
 
         /// <summary>Finds the record with highest deaths.</summary>
         /// <returns>The CovidRecord with the highest deaths</returns>
@@ -97,7 +116,9 @@ namespace Covid19Analysis.Model
         /// <returns>The CovidRecord with highest percentage of positive tests</returns>
         public CovidRecord FindRecordWithHighestPercentageOfPositiveTests()
         {
-            var recordWithHighestPercentage = this.CovidRecords.OrderByDescending(FindPositivePercentageForRecord).ThenByDescending(record => record.PositiveTests).First(record => record.TotalTests != 0);
+            var recordWithHighestPercentage = this.CovidRecords.OrderByDescending(FindPositivePercentageForRecord)
+                                                  .ThenByDescending(record => record.PositiveTests)
+                                                  .First(record => record.TotalTests != 0);
             return recordWithHighestPercentage;
         }
 
@@ -113,6 +134,31 @@ namespace Covid19Analysis.Model
             return averagePositiveTests;
         }
 
+
+        /// <summary>Finds the average positive tests since a specified date.</summary>
+        /// <param name="sinceDate">The date indicator to not count the lowest.</param>
+        /// <returns>The average positive tests since the date specified</returns>
+        public double FindAveragePositiveTestsSinceSpecifiedDate(DateTime sinceDate)
+        {
+            var firstDateWithPositive = this.FindDayOfFirstPositiveTest();
+            var averagePositiveTests = this.CovidRecords
+                                           .Where(record => record.Date >= firstDateWithPositive)
+                                           .Select(record => record.PositiveTests).Average();
+            return averagePositiveTests;
+        }
+
+
+        /// <summary>Finds the average total tests since a specified date.</summary>
+        /// <param name="sinceDate">The date indicator to not count the lowest.</param>
+        /// <returns>The average total tests since the date specified</returns>
+        public double FindAverageTotalTestsSinceSpecifiedDate(DateTime sinceDate)
+        {
+            var firstDateWithPositive = this.FindDayOfFirstPositiveTest();
+            var averageTotalTests = this.CovidRecords
+                                           .Where(record => record.Date >= firstDateWithPositive)
+                                           .Select(record => record.TotalTests).Average();
+            return averageTotalTests;
+        }
 
         /// <summary>Finds the overall positivity rate since first positive test.</summary>
         /// <returns>The overall positivity rate since first positive test date</returns>

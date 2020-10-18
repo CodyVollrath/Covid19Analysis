@@ -50,11 +50,21 @@ namespace Covid19Analysis.OutputFormatter
         /// <Summary>Gets the first day of positive test.</Summary>
         /// <returns>The formatted string of the first day of the positive test</returns>
         public string GetFirstDayOfPositiveTest()
-        { 
-            var firstDayOfPositiveTest = this.covidStatistics.FindDayOfFirstPositiveTest(); 
-            var dayOfFirstPositiveTest = $"{Assets.FirstDayOfPositiveTestLabel} " +
+        {
+            string dayOfFirstPositiveTest;
+            try
+            {
+                var firstDayOfPositiveTest = this.covidStatistics.FindDayOfFirstPositiveTest();
+
+                 dayOfFirstPositiveTest = $"{Assets.FirstDayOfPositiveTestLabel} " +
                                              $"{firstDayOfPositiveTest.ToString(Assets.DateStringFormatted)}" +
                                              $"{Environment.NewLine}";
+            }
+            catch (Exception)
+            {
+                dayOfFirstPositiveTest = Assets.NoPositiveData;
+            }
+
             return dayOfFirstPositiveTest;
         }
 
@@ -117,10 +127,21 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>A formatted string with the highest percentage of positive  test and date</returns>
         public string GetHighestPercentageOfTestsPerDayWithDate()
         {
-            var highestPercentageRecord = this.covidStatistics.FindRecordWithHighestPercentageOfPositiveTests();
-            var positivePercentage = CovidDataStatistics.FindPositivePercentageForRecord(highestPercentageRecord);
-            var highestPercentage = Format.FormatNumericValueAsPercentage(positivePercentage);
-            var date = highestPercentageRecord.Date.ToString(Assets.DateStringFormatted); 
+            string highestPercentage;
+            var date = string.Empty;
+            try
+            {
+                var highestPercentageRecord = this.covidStatistics.FindRecordWithHighestPercentageOfPositiveTests();
+                var positivePercentage = CovidDataStatistics.FindPositivePercentageForRecord(highestPercentageRecord);
+                highestPercentage = Format.FormatNumericValueAsPercentage(positivePercentage);
+                date = highestPercentageRecord.Date.ToString(Assets.DateStringFormatted);
+            }
+            catch (Exception)
+            {
+                highestPercentage = Assets.NoPositiveData;
+            }
+
+
             return CovidDataLines.GetCovidLineForValueAndDate(Assets.HighestPercentageOfPositiveCasesLabel, highestPercentage, date);
             
         }
@@ -134,8 +155,17 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>A formatted string with the average positive  test.</returns>
         public string GetAveragePositiveTestsSinceFirstPositiveTest()
         {
-            var averagePositiveTest = this.covidStatistics.FindAveragePositiveTestsSinceFirstPositiveTest();
-            var average = Format.FormatAveragesWithTwoDecimalPlaces(averagePositiveTest);
+            string average;
+            try
+            {
+                var averagePositiveTest = this.covidStatistics.FindAveragePositiveTestsSinceFirstPositiveTest();
+                average = Format.FormatAveragesWithTwoDecimalPlaces(averagePositiveTest);
+            }
+            catch (Exception)
+            {
+                average = Assets.NoPositiveData;
+            }
+
             return CovidDataLines.GetCovidLineForValue(Assets.AveragePositiveTestsLabel, average);
         }
 
@@ -143,8 +173,17 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>A formatted string with the Overall Positivity Rate.</returns>
         public string GetOverallPositivityRateSinceFirstPositiveTest()
         {
-            var overallPositivityRate = this.covidStatistics.FindOverallPositivityRateSinceFirstPositiveTest();
-            var positivityRate = Format.FormatNumericValueAsPercentage(overallPositivityRate);
+            string positivityRate;
+            try
+            {
+                var overallPositivityRate = this.covidStatistics.FindOverallPositivityRateSinceFirstPositiveTest();
+                positivityRate = Format.FormatNumericValueAsPercentage(overallPositivityRate);
+            }
+            catch (Exception)
+            {
+                positivityRate = Assets.NoPositiveData;
+            }
+
             return CovidDataLines.GetCovidLineForValue(Assets.OverallPositivityRateLabel, positivityRate);
         }
 
@@ -155,11 +194,20 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>A formatted string with the days greater than a threshold.</returns>
         public string GetTheDaysFromTheFirstPositiveTestGreaterThanThreshold(int threshold)
         {
-            var daysGreaterThanThreshold =
-                this.covidStatistics.FindNumberOfDaysForPositiveTestsGreaterThanThreshold(threshold);
+            string thresholdFormatted;
+            var days = string.Empty;
+            try
+            {
+                var daysGreaterThanThreshold =
+                    this.covidStatistics.FindNumberOfDaysForPositiveTestsGreaterThanThreshold(threshold);
 
-            var days = Format.FormatIntegerAsFormattedString(daysGreaterThanThreshold);
-            var thresholdFormatted = Format.FormatIntegerAsFormattedString(threshold);
+                days = Format.FormatIntegerAsFormattedString(daysGreaterThanThreshold);
+                thresholdFormatted = Format.FormatIntegerAsFormattedString(threshold);
+            }
+            catch (Exception)
+            {
+                thresholdFormatted = Assets.NoPositiveData;
+            }
             return CovidDataLines.GetCovidLineForValueWithThreshold(Assets.DaysGreaterThanValueLabel, days, thresholdFormatted);
         }
 
@@ -167,11 +215,20 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>A formatted string with the days less than a threshold.</returns>
         public string GetTheDaysFromTheFirstPositiveTestLessThanThreshold(int threshold)
         {
-            var daysLessThanThreshold =
-                this.covidStatistics.FindNumberOfDaysForPositiveTestsLessThanThreshold(threshold);
+            string thresholdFormatted;
+            var days = string.Empty;
+            try
+            {
+                var daysLessThanThreshold =
+                    this.covidStatistics.FindNumberOfDaysForPositiveTestsLessThanThreshold(threshold);
 
-            var days = Format.FormatIntegerAsFormattedString(daysLessThanThreshold);
-            var thresholdFormatted = Format.FormatIntegerAsFormattedString(threshold);
+                days = Format.FormatIntegerAsFormattedString(daysLessThanThreshold);
+                thresholdFormatted = Format.FormatIntegerAsFormattedString(threshold);
+            }
+            catch (Exception)
+            {
+                thresholdFormatted = Assets.NoPositiveData;
+            }
             return CovidDataLines.GetCovidLineForValueWithThreshold(Assets.DaysLessThanValueLabel, days, thresholdFormatted);
         }
 
@@ -184,13 +241,21 @@ namespace Covid19Analysis.OutputFormatter
         /// <returns>The histogram of the positive tests</returns>
         public string GetTheFrequencyTableHistogramOfPositiveTests(int binSize)
         {
-            var positiveTests = (from record in this.CovidRecords
-                                 where record.Date.Date >= this.getDateOfFirstPositiveTest()
-                                 orderby record.PositiveTests descending
-                                 select record.PositiveTests).ToList();
-            var histogramGenerator = new CovidDataHistogramGenerator(positiveTests, binSize);
-            var histogram = $"{Environment.NewLine}{Assets.HistogramLabel}{Environment.NewLine}";
-            histogram += histogramGenerator.GenerateHistogram();
+            var histogram = string.Empty;
+            try
+            {
+                var positiveTests = (from record in this.CovidRecords
+                                     where record.Date.Date >= this.getDateOfFirstPositiveTest()
+                                     orderby record.PositiveTests descending
+                                     select record.PositiveTests).ToList();
+                var histogramGenerator = new CovidDataHistogramGenerator(positiveTests, binSize);
+                histogram = $"{Environment.NewLine}{Assets.HistogramLabel}{Environment.NewLine}";
+                histogram += histogramGenerator.GenerateHistogram();
+            }
+            catch (Exception)
+            {
+                histogram += Assets.NoPositiveData;
+            }
             return histogram;
         }
 

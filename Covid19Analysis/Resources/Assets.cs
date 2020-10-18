@@ -20,6 +20,8 @@ namespace Covid19Analysis.Resources
         public const string MonthNameIdentifier = "MMMM";
 
         public const string NoCovidDataText = "No CovidData in the dataset";
+
+        public const string NoPositiveData = "No Positive Tests are present in the data set";
         #endregion
 
         #region Prompt Labels

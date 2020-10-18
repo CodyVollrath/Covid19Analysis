@@ -18,6 +18,11 @@ namespace Covid19Analysis.OutputFormatter
         public CovidDataCollection CovidRecords { get; }
         #endregion
 
+        #region Private Members
+
+        private CovidDataStatistics covidStatistics;
+        #endregion
+
         #region Constructors
         /// <Summary>
         /// Initializes a new instance of the <a onclick="return false;" href="CovidDataStateSummary" originaltag="see">CovidDataMonthlySummary</a> class.
@@ -50,7 +55,7 @@ namespace Covid19Analysis.OutputFormatter
 
         #region Private Helpers
 
-        private static string getTotalMonthData(ICollection<CovidRecord> covidRecords)
+        private string getTotalMonthData(ICollection<CovidRecord> covidRecords)
         {
             var monthsInTheData = covidRecords
                                   .Select(record => new DateTime(year: record.Date.Year, month: record.Date.Month, day:1))
@@ -72,7 +77,7 @@ namespace Covid19Analysis.OutputFormatter
                     continue;
                 }
                 var monthData = groupByMonths.FirstOrDefault(group => group.Key.Equals(monthYear));
-                summary += getDataForTheMonthGroup(monthData);
+                summary += this.getDataForTheMonthGroup(monthData);
             }
 
             return summary;
@@ -106,27 +111,27 @@ namespace Covid19Analysis.OutputFormatter
             return monthYearsWithinRange;
         }
 
-        private static string getDataForTheMonthGroup(IGrouping<DateTime, CovidRecord> monthGroup)
+        private string getDataForTheMonthGroup(IGrouping<DateTime, CovidRecord> monthGroup)
         {
             var reportOfTheMonth = string.Empty;
             var monthGroupKey = Format.GetMonthAndYearFromDateTime(monthGroup.Key);
             var monthHeading =
                 $"{Environment.NewLine}{monthGroupKey} ({monthGroup.Count()} {Assets.DaysOfDataLabel}):{Environment.NewLine}";
-
+            this.covidStatistics = new CovidDataStatistics(monthGroup);
             reportOfTheMonth += monthHeading;
-            reportOfTheMonth += getHighestPositiveTestWithDays(monthGroup);
-            reportOfTheMonth += getLowestPositiveTestWithDays(monthGroup);
-            reportOfTheMonth += getHighestTotalTestsWithDays(monthGroup);
-            reportOfTheMonth += getLowestTotalTestsWithDays(monthGroup);
-            reportOfTheMonth += getAveragePositiveTests(monthGroup);
-            reportOfTheMonth += getAverageTotalTests(monthGroup);
+            reportOfTheMonth += this.getHighestPositiveTestWithDays(monthGroup);
+            reportOfTheMonth += this.getLowestPositiveTestWithDays(monthGroup);
+            reportOfTheMonth += this.getHighestTotalTestsWithDays(monthGroup);
+            reportOfTheMonth += this.getLowestTotalTestsWithDays(monthGroup);
+            reportOfTheMonth += this.getAveragePositiveTests();
+            reportOfTheMonth += this.getAverageTotalTests();
             return $"{reportOfTheMonth}";
         }
 
-        private static string getHighestPositiveTestWithDays(IEnumerable<CovidRecord> collection)
+        private string getHighestPositiveTestWithDays(IEnumerable<CovidRecord> collection)
         {
             var covidRecords = collection.ToArray();
-            var highestPositiveTests = (from record in covidRecords orderby record.PositiveTests descending select record.PositiveTests).First();
+            var highestPositiveTests = this.covidStatistics.FindRecordWithHighestDeaths().PositiveTests; 
 
             var daysOccurred =
                 (from record in covidRecords where record.PositiveTests == highestPositiveTests select record.Date).ToList();
@@ -137,27 +142,34 @@ namespace Covid19Analysis.OutputFormatter
             return CovidDataLines.GetCovidLineForValueAndDaysOfMonth(Assets.HighestPositiveTestsLabel, highestPositivesFormatted, daysOutput);
         }
 
-        private static string getLowestPositiveTestWithDays(IEnumerable<CovidRecord> collection)
+        private string getLowestPositiveTestWithDays(IEnumerable<CovidRecord> collection)
         {
-            var covidRecords = collection.ToArray();
-            var lowestPositiveTests = (from record in covidRecords orderby record.PositiveTests ascending select record.PositiveTests).First();
-
-            var daysOccurred =
-                (from record in covidRecords where record.PositiveTests == lowestPositiveTests select record.Date).ToList();
-
-            var daysOutput = Format.GetListOfDaysWithOrdinals(daysOccurred);
-            var lowestPositivesFormatted = Format.FormatIntegerAsFormattedString(lowestPositiveTests);
-
+            var daysOutput = string.Empty;
+            string lowestPositivesFormatted;
+            try
+            {
+                var covidRecords = collection.ToArray();
+                var dateSinceFirstPositive = this.getDateOfFirstPositiveTest();
+                var lowestPositiveTests = this.covidStatistics.FindRecordWithLowestPositiveCases(dateSinceFirstPositive)
+                                              .PositiveTests;
+                var daysOccurred =
+                    (from record in covidRecords where record.PositiveTests == lowestPositiveTests select record.Date)
+                    .ToList();
+                daysOutput = Format.GetListOfDaysWithOrdinals(daysOccurred);
+                lowestPositivesFormatted = Format.FormatIntegerAsFormattedString(lowestPositiveTests);
+            }
+            catch (Exception)
+            {
+                lowestPositivesFormatted = Assets.NoPositiveData;
+            }
             return CovidDataLines.GetCovidLineForValueAndDaysOfMonth(Assets.LowestPositiveTestsLabel,
                 lowestPositivesFormatted, daysOutput);
         }
 
-        private static string getHighestTotalTestsWithDays(IEnumerable<CovidRecord> collection)
+        private string getHighestTotalTestsWithDays(IEnumerable<CovidRecord> collection)
         {
             var covidRecords = collection.ToArray();
-            var highestTotalTests = (from record in covidRecords
-                                        orderby record.TotalTests descending
-                                        select record.TotalTests).First();
+            var highestTotalTests = this.covidStatistics.FindRecordWithHighestTotalTests().TotalTests;
 
             var daysOccurred =
                 (from record in covidRecords where record.TotalTests == highestTotalTests select record.Date).ToList();
@@ -169,38 +181,78 @@ namespace Covid19Analysis.OutputFormatter
                 highestTotalTestsFormatted, daysOutput);
         }
 
-        private static string getLowestTotalTestsWithDays(IEnumerable<CovidRecord> collection)
+        private string getLowestTotalTestsWithDays(IEnumerable<CovidRecord> collection)
         {
-            var covidRecords = collection.ToArray();
-            var lowestTotalTests = (from record in covidRecords
-                                       orderby record.TotalTests ascending
-                                       select record.TotalTests).First();
+            var daysOutput = string.Empty;
+            string lowestTotalTestsFormatted;
+            try
+            {
+                var covidRecords = collection.ToArray();
+                var lowestTotalTests = (from record in covidRecords
+                                        orderby record.TotalTests ascending
+                                        select record.TotalTests).First();
 
-            var daysOccurred =
-                (from record in covidRecords where record.TotalTests == lowestTotalTests select record.Date).ToList();
+                var daysOccurred =
+                    (from record in covidRecords where record.TotalTests == lowestTotalTests select record.Date)
+                    .ToList();
 
-            var daysOutput = Format.GetListOfDaysWithOrdinals(daysOccurred);
-            var lowestTotalTestsFormatted = Format.FormatIntegerAsFormattedString(lowestTotalTests);
+                daysOutput = Format.GetListOfDaysWithOrdinals(daysOccurred);
+                lowestTotalTestsFormatted = Format.FormatIntegerAsFormattedString(lowestTotalTests);
+            }
+            catch (Exception)
+            {
+                lowestTotalTestsFormatted = Assets.NoPositiveData;
+            }
             return CovidDataLines.GetCovidLineForValueAndDaysOfMonth(Assets.LowestTotalTestsLabel, lowestTotalTestsFormatted, daysOutput);
         }
 
-        private static string getAveragePositiveTests(IEnumerable<CovidRecord> collection)
+        private string getAveragePositiveTests()
         {
-            var positiveAverage = collection.Average(record => record.PositiveTests);
-            var positiveAverageFormatted = Format.FormatAveragesWithTwoDecimalPlaces(positiveAverage);
+            string positiveAverageFormatted;
+            try
+            {
+                var dateSinceFirstPositiveTests = this.getDateOfFirstPositiveTest();
+                var positiveAverage = this.covidStatistics.FindAveragePositiveTestsSinceSpecifiedDate(dateSinceFirstPositiveTests);
+                positiveAverageFormatted = Format.FormatAveragesWithTwoDecimalPlaces(positiveAverage);
+            }
+            catch(Exception)
+            {
+                positiveAverageFormatted = Assets.NoPositiveData;
+            }
             return CovidDataLines.GetCovidLineForValue(Assets.AveragePositiveTestsLabel, positiveAverageFormatted);
         }
 
-        private static string getAverageTotalTests(IEnumerable<CovidRecord> collection)
+        private string getAverageTotalTests()
         {
-            var totalTestsAverage = collection.Average(record => record.TotalTests);
-            var totalTestsAverageFormatted = Format.FormatAveragesWithTwoDecimalPlaces(totalTestsAverage);
+            string totalTestsAverageFormatted;
+            try
+            {
+                var firstPositiveTestDate = this.getDateOfFirstPositiveTest();
+                var totalTestsAverage =
+                    this.covidStatistics.FindAverageTotalTestsSinceSpecifiedDate(firstPositiveTestDate);
+                totalTestsAverageFormatted = Format.FormatAveragesWithTwoDecimalPlaces(totalTestsAverage);
+            }
+            catch (Exception)
+            {
+                totalTestsAverageFormatted = Assets.NoPositiveData;
+            }
             return CovidDataLines.GetCovidLineForValue(Assets.AverageTotalTestsLabel, totalTestsAverageFormatted);
         }
 
         private IEnumerable<CovidRecord> getSortedListByMonth()
         {
-            var sortedListByMonth = (from record in this.CovidRecords where record.Date.Date >= this.getDateOfFirstPositiveTest() orderby record.Date select record).ToList();
+            IEnumerable<CovidRecord> sortedListByMonth;
+            try
+            {
+                sortedListByMonth = (from record in this.CovidRecords
+                                     where record.Date.Date >= this.getDateOfFirstPositiveTest()
+                                     orderby record.Date
+                                     select record).ToList();
+            }
+            catch (Exception)
+            {
+                sortedListByMonth = this.CovidRecords.CovidRecords.OrderBy(record => record.Date).ToList();
+            }
             return sortedListByMonth;
         }
 
