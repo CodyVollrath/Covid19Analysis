@@ -108,7 +108,6 @@ namespace Covid19Analysis.OutputFormatter
             this.buildCovidSummary();
         }
 
-
         /// <summary>Merges the and loads the covid data.</summary>
         /// <param name="textContent">Content of the text.</param>
         /// <exception cref="ArgumentNullException">textContent</exception>
@@ -199,7 +198,7 @@ namespace Covid19Analysis.OutputFormatter
             }
             catch (Exception)
             {
-                isSaved = false;
+                isSaved = false; 
             }
             return isSaved;
         }

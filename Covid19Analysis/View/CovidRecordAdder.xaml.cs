@@ -8,15 +8,30 @@ using Covid19Analysis.Resources;
 
 namespace Covid19Analysis.View
 {
+
+    /// <summary>This class is responsible for the logic behind the addition of a CovidRecord to the data set within the application</summary>
     public sealed partial class CovidRecordAdder
     {
+        #region Properties
+
+        /// <summary>Gets the created record.</summary>
+        /// <value>The created record.</value>
         public CovidRecord CreatedRecord { get; private set; }
 
+        #endregion
+
+        #region Constructors
+
+        /// <summary>Initializes a new instance of the <see cref="CovidRecordAdder" /> class.</summary>
         public CovidRecordAdder()
         {
             this.InitializeComponent();
             this.IsPrimaryButtonEnabled = false;
         }
+
+        #endregion
+
+        #region Events
 
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
@@ -27,7 +42,8 @@ namespace Covid19Analysis.View
             var deaths = Format.FormatStringToInteger(this.deathsTextBox.Text);
             var hospitalizations = Format.FormatStringToInteger(this.hospitalizationsTextBox.Text);
 
-            this.CreatedRecord = new CovidRecord(date, state) {
+            this.CreatedRecord = new CovidRecord(date, state)
+            {
                 PositiveTests = positiveCases,
                 NegativeTests = negativeCases,
                 Deaths = deaths,
@@ -49,7 +65,7 @@ namespace Covid19Analysis.View
 
         private void positiveCasesTextBox_BeforeTextChanging(TextBox sender, TextBoxBeforeTextChangingEventArgs args)
         {
-            args.Cancel = args.NewText.Any(c=> !char.IsDigit(c));
+            args.Cancel = args.NewText.Any(c => !char.IsDigit(c));
         }
 
         private void negativeCasesTextBox_BeforeTextChanging(TextBox sender, TextBoxBeforeTextChangingEventArgs args)
@@ -112,6 +128,9 @@ namespace Covid19Analysis.View
                 this.IsPrimaryButtonEnabled = true;
             }
         }
+
+
+        #endregion
 
 
     }

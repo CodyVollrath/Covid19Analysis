@@ -186,9 +186,8 @@ namespace Covid19Analysis.OutputFormatter
             try
             {
                 var covidRecords = collection.ToArray();
-                var lowestTotalTests = (from record in covidRecords
-                                        orderby record.TotalTests ascending
-                                        select record.TotalTests).First();
+                var firstDateOfPositiveTest = this.getDateOfFirstPositiveTest();
+                var lowestTotalTests = this.covidStatistics.FindRecordWithLowestTotalTests(firstDateOfPositiveTest).TotalTests;
 
                 var daysOccurred =
                     (from record in covidRecords where record.TotalTests == lowestTotalTests select record.Date)

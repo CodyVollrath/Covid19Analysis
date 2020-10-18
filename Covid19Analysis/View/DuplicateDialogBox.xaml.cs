@@ -11,8 +11,7 @@ namespace Covid19Analysis.View
     public sealed partial class DuplicateDialogBox
     {
 
-        #region Data Members
-
+        #region Properties
         /// <Summary>Gets a value indicating whether the chosen user action will continue for all items in the data table</Summary>
         /// <value>
         ///   <c>true</c> if checkbox is checked;otherwise, <c>false</c>.</value>
