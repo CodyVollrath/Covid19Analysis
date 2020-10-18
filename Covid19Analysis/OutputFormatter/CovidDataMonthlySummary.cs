@@ -264,9 +264,6 @@ namespace Covid19Analysis.OutputFormatter
                                                  select record).First();
             return firstDateOfPositiveTestRecord.Date;
         }
-
         #endregion
-
-
     }
 }

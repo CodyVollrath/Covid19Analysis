@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace Covid19Analysis.Resources
 {
     /// <Summary>This class contains static constants that are used frequently in the Covid19 Analysis application.</Summary>
@@ -21,7 +23,8 @@ namespace Covid19Analysis.Resources
 
         public const string NoCovidDataText = "No CovidData in the dataset";
 
-        public const string NoPositiveData = "No Positive Tests are present in the data set";
+        public static readonly string NoPositiveData = $"No Positive Tests are present in the data set {Environment.NewLine}";
+
         #endregion
 
         #region Prompt Labels

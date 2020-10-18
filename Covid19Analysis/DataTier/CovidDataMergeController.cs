@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Covid19Analysis.Model;
-using Covid19Analysis.Resources;
 
 namespace Covid19Analysis.DataTier
 {

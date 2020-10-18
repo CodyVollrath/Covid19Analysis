@@ -70,7 +70,8 @@ namespace Covid19Analysis.DataTier
         private void setCovidDataCollection(string record, int lineNumber)
         {
             var covidRecord = createCovidRecord(record);
-            if (covidRecord == null)
+            var isCovidRecordDuplicateOrNull = this.isRecordDuplicate(covidRecord) || covidRecord == null;
+            if (isCovidRecordDuplicateOrNull)
             {
                 this.CovidErrorLogger.AddErrorLineToErrorLogger(lineNumber, record);
             }
@@ -128,6 +129,11 @@ namespace Covid19Analysis.DataTier
             }
             covidData.RemoveAt(0);
             return covidData.ToArray();
+        }
+
+        private bool isRecordDuplicate(CovidRecord record)
+        {
+            return this.covidDataCollection.Contains(record);
         }
         #endregion
 

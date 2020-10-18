@@ -72,6 +72,7 @@ namespace Covid19AnalysisTests.CovidDataStatisticsTests
         [TestMethod]
         public void TestEmptyCovidDataCollection()
         {
+            // ReSharper disable once CollectionNeverUpdated.Local
             var covidCollection = new CovidDataCollection();
             var covidStatistics = new CovidDataStatistics(covidCollection);
             Assert.ThrowsException<InvalidOperationException>(() => covidStatistics.FindRecordWithHighestPositiveCases());

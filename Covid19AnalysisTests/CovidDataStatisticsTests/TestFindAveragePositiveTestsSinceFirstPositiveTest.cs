@@ -50,6 +50,7 @@ namespace Covid19AnalysisTests.CovidDataStatisticsTests
         [TestMethod]
         public void TestAverageEmptyCovidDataCollection()
         {
+            // ReSharper disable once CollectionNeverUpdated.Local
             var covidCollection = new CovidDataCollection();
             var covidStatistics = new CovidDataStatistics(covidCollection);
             Assert.ThrowsException<InvalidOperationException>(() => covidStatistics.FindAveragePositiveTestsSinceFirstPositiveTest());
