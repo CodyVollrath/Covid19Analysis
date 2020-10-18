@@ -10,7 +10,6 @@ namespace Covid19Analysis.OutputFormatter
     /// <Summary>This class generates the Summary for the monthly values</Summary>
     public class CovidDataMonthlySummary
     {
-        
         #region Properties
 
         /// <Summary>Gets the covid collection.</Summary>
@@ -19,7 +18,6 @@ namespace Covid19Analysis.OutputFormatter
         #endregion
 
         #region Private Members
-
         private CovidDataStatistics covidStatistics;
         #endregion
 
@@ -46,7 +44,7 @@ namespace Covid19Analysis.OutputFormatter
             var covidRecords = this.getSortedListByMonth().ToList();
             var monthlySummary = string.Empty;
 
-            monthlySummary += getTotalMonthData(covidRecords);
+            monthlySummary += this.getTotalMonthData(covidRecords);
 
             return monthlySummary;
         }

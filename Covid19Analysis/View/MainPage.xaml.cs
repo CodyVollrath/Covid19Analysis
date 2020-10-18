@@ -43,7 +43,6 @@ namespace Covid19Analysis.View
         #endregion
 
         #region Constructors
-
         /// <Summary>
         ///     Initializes a new instance of the <see cref="MainPage" /> class.
         /// </Summary>
@@ -315,18 +314,18 @@ namespace Covid19Analysis.View
 
         private static async void showSaveSuccessfulPrompt(bool didFileSaveProperly)
         {
-            var title = "File Not Saved!";
-            var content = "The file that was attempted to be saved to could not be opened or failed to be created.";
+            var title = Assets.SaveFailedTitle;
+            var content = Assets.SaveFailedContent;
             if (didFileSaveProperly)
             {
-                title = "Success!";
-                content = "File has been saved";
+                title = Assets.SaveSuccessfulTitle;
+                content = Assets.SaveSuccessfulContent;
             }
 
             var isFileSavedDialog = new ContentDialog() {
                 Title = title,
                 Content = content,
-                CloseButtonText = "Ok"
+                CloseButtonText = Assets.OkPrompt
             };
             await isFileSavedDialog.ShowAsync();
         }

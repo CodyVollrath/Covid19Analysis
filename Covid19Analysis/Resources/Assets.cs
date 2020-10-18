@@ -88,6 +88,13 @@ namespace Covid19Analysis.Resources
         public const string MergeFilesPrimaryButtonText = "Merge";
         public const string MergeFilesSecondaryButtonText = "Replace";
 
+        public const string SaveFailedTitle = "File Not Saved!";
+        public const string SaveFailedContent = "The file that was attempted to be saved to could not be opened or failed to be created.";
+
+        public const string SaveSuccessfulTitle = "Success!";
+        public const string SaveSuccessfulContent = "File has been saved";
+        public const string OkPrompt = "Ok";
+
         #endregion
 
     }

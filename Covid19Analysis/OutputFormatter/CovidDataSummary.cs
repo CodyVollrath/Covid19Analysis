@@ -145,8 +145,6 @@ namespace Covid19Analysis.OutputFormatter
             return CovidDataLines.GetCovidLineForValueAndDate(Assets.HighestPercentageOfPositiveCasesLabel, highestPercentage, date);
             
         }
-
-
         #endregion
 
         #region Average Metrics

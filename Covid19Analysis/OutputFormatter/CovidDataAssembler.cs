@@ -142,6 +142,10 @@ namespace Covid19Analysis.OutputFormatter
             this.mergeAndRebuildAllCovidData();
         }
 
+
+        /// <summary>Does the covid record exist.</summary>
+        /// <param name="record">The record.</param>
+        /// <returns>True if record is present in the CovidDataCollection, false otherwise.</returns>
         public bool DoesCovidRecordExist(CovidRecord record)
         {
             var doesCovidRecordExist = false;
@@ -153,27 +157,27 @@ namespace Covid19Analysis.OutputFormatter
             return doesCovidRecordExist;
         }
 
+
+        /// <summary>Adds the covid record to collection or creates a new collection if there is not a collection present.</summary>
+        /// <param name="record">The record.</param>
         public void AddCovidRecordToCollection(CovidRecord record)
         {
             if (this.IsCovidDataLoaded)
             {
-                if (record.State.Equals(this.StateFilter))
-                {
-                    this.loadedCovidDataCollection.Add(record);
-                    this.allCovidData.Add(record);
-                }
-                else
-                {
-                    this.allCovidData.Add(record);
-                }
+                this.addCovidRecordToExistingCollection(record);
             }
             else
             {
-                this.loadedCovidDataCollection = new CovidDataCollection {record};
-                this.allCovidData = this.loadedCovidDataCollection.Clone();
-                this.IsCovidDataLoaded = true;
+                this.createAndAddToTheCovidDataCollection(record);
             }
             this.buildCovidSummary();
+        }
+
+        private void createAndAddToTheCovidDataCollection(CovidRecord record)
+        {
+            this.loadedCovidDataCollection = new CovidDataCollection {record};
+            this.allCovidData = this.loadedCovidDataCollection.Clone();
+            this.IsCovidDataLoaded = true;
         }
 
         /// <summary>Gets the duplicates from merged data.</summary>
@@ -203,6 +207,7 @@ namespace Covid19Analysis.OutputFormatter
             return isSaved;
         }
 
+        /// <summary>Updates the covid summary with new data that is loaded.</summary>
         public void UpdateSummary()
         {
             this.buildCovidSummary();
@@ -261,6 +266,19 @@ namespace Covid19Analysis.OutputFormatter
         {
             this.allCovidData.AddAll(this.mergeController.MergedCovidDataCollection);
             this.buildCovidSummary();
+        }
+
+        private void addCovidRecordToExistingCollection(CovidRecord record)
+        {
+            if (record.State.Equals(this.StateFilter))
+            {
+                this.loadedCovidDataCollection.Add(record);
+                this.allCovidData.Add(record);
+            }
+            else
+            {
+                this.allCovidData.Add(record);
+            }
         }
         #endregion
 
