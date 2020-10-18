@@ -11,7 +11,7 @@
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
 
-    <Grid Height="300" Margin="0,0,-20,109">
+    <Grid Margin="0,0,-15,-11">
 
         <TextBlock Text="Date:" Margin="0,10,324,124"/>
         <DatePicker x:Name="covidRecordDate" Margin="37,2,0,0" VerticalAlignment="Top" Height="33" DateChanged="covidRecordDate_DateChanged"/>

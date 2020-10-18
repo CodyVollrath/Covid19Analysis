@@ -48,7 +48,7 @@ namespace Covid19Analysis.OutputFormatter
         #region Private Members
         private CovidDataErrorLogger covidErrorLogger;
 
-        private CovidDataCollection loadedCovidDataCollection;
+        private CovidDataCollection filteredCovidDataCollection;
 
         private CovidDataCollection allCovidData;
 
@@ -80,7 +80,7 @@ namespace Covid19Analysis.OutputFormatter
             this.Summary = string.Empty;
             this.IsCovidDataLoaded = false;
             this.covidErrorLogger = null;
-            this.loadedCovidDataCollection = null;
+            this.filteredCovidDataCollection = null;
             this.allCovidData = null;
             this.mergeController = null;
         }
@@ -102,8 +102,8 @@ namespace Covid19Analysis.OutputFormatter
             textContent = textContent ?? throw new ArgumentNullException(nameof(textContent));
             var parser = new CovidCsvParser(textContent);
             this.covidErrorLogger = parser.CovidErrorLogger;
-            this.loadedCovidDataCollection = parser.GenerateCovidDataCollection();
-            this.allCovidData = this.loadedCovidDataCollection.Clone();
+            this.filteredCovidDataCollection = parser.GenerateCovidDataCollection();
+            this.allCovidData = this.filteredCovidDataCollection.Clone();
             this.IsCovidDataLoaded = true;
             this.buildCovidSummary();
         }
@@ -119,7 +119,7 @@ namespace Covid19Analysis.OutputFormatter
             var parser = new CovidCsvParser(textContent);
             var newCovidDataCollection = parser.GenerateCovidDataCollection();
             this.covidErrorLogger = parser.CovidErrorLogger;
-            this.mergeController = new CovidDataMergeController(this.loadedCovidDataCollection, newCovidDataCollection, this.StateFilter);
+            this.mergeController = new CovidDataMergeController(this.filteredCovidDataCollection, newCovidDataCollection, this.StateFilter);
             this.mergeController.AddAllNonDuplicates();
             this.mergeAndRebuildAllCovidData();
         }
@@ -130,14 +130,14 @@ namespace Covid19Analysis.OutputFormatter
         {
             if (this.mergeController == null)
             {
-                this.loadedCovidDataCollection.ReplaceDuplicateRecords(covidRecord);
+                this.filteredCovidDataCollection.ReplaceDuplicateRecords(covidRecord);
                 this.allCovidData.ReplaceDuplicateRecords(covidRecord);
                 this.buildCovidSummary();
                 return;
             }
 
             this.mergeController.ReplaceDuplicate(covidRecord);
-            this.loadedCovidDataCollection = this.mergeController.MergedCovidDataCollection;
+            this.filteredCovidDataCollection = this.mergeController.MergedCovidDataCollection;
             this.IsCovidDataLoaded = true;
             this.mergeAndRebuildAllCovidData();
         }
@@ -170,14 +170,11 @@ namespace Covid19Analysis.OutputFormatter
             {
                 this.createAndAddToTheCovidDataCollection(record);
             }
-            this.buildCovidSummary();
-        }
 
-        private void createAndAddToTheCovidDataCollection(CovidRecord record)
-        {
-            this.loadedCovidDataCollection = new CovidDataCollection {record};
-            this.allCovidData = this.loadedCovidDataCollection.Clone();
-            this.IsCovidDataLoaded = true;
+            if (this.filteredCovidDataCollection != null)
+            {
+                this.buildCovidSummary();
+            }
         }
 
         /// <summary>Gets the duplicates from merged data.</summary>
@@ -220,7 +217,7 @@ namespace Covid19Analysis.OutputFormatter
         private void buildCovidSummary()
         {
             const string genericHeader = Assets.StateCovidDataHeadingLabel;
-            var stateSummary = new CovidDataSummary(this.loadedCovidDataCollection, this.StateFilter);
+            var stateSummary = new CovidDataSummary(this.filteredCovidDataCollection, this.StateFilter);
             var isStateNotNull = this.StateFilter != null;
             var stateSpecificHeader = $"{this.StateFilter} {Assets.StateCovidDataHeadingLabel}";
             
@@ -272,13 +269,28 @@ namespace Covid19Analysis.OutputFormatter
         {
             if (record.State.Equals(this.StateFilter))
             {
-                this.loadedCovidDataCollection.Add(record);
+                this.filteredCovidDataCollection.Add(record);
                 this.allCovidData.Add(record);
             }
             else
             {
                 this.allCovidData.Add(record);
             }
+        }
+        private void createAndAddToTheCovidDataCollection(CovidRecord record)
+        {
+            if (record.State.Equals(this.StateFilter))
+            {
+                this.filteredCovidDataCollection = new CovidDataCollection { record };
+                this.allCovidData = this.filteredCovidDataCollection.Clone();
+                this.IsCovidDataLoaded = true;
+            }
+            else
+            {
+                this.allCovidData = new CovidDataCollection(){record};
+            }
+
+            
         }
         #endregion
 

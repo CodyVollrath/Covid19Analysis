@@ -20,6 +20,7 @@ namespace Covid19Analysis.OutputFormatter
         public List<int> CollectionOfNumericValues { get; }
 
         #endregion
+
         #region Inner Classes
 
         /// <summary>This Inner class keeps track of the range values for individual ranges in the histogram</summary>
